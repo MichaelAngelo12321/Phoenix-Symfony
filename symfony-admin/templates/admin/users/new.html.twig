@@ -1,0 +1,333 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dodaj nowego użytkownika{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('admin_users_index') }}">Użytkownicy</a></li>
+                            <li class="breadcrumb-item active">Dodaj nowego</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0 text-gray-800">Dodaj nowego użytkownika</h1>
+                </div>
+                <div>
+                    <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Powrót do listy
+                    </a>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-user-plus"></i> Formularz dodawania użytkownika
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{{ path('admin_users_create') }}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="first_name" class="form-label required">Imię</label>
+                                            <input type="text" 
+                                                   class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" 
+                                                   id="first_name" 
+                                                   name="first_name" 
+                                                   value="{{ data.first_name ?? '' }}" 
+                                                   required 
+                                                   maxlength="100"
+                                                   placeholder="Wprowadź imię">
+                                            {% if errors.first_name is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.first_name %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="last_name" class="form-label required">Nazwisko</label>
+                                            <input type="text" 
+                                                   class="form-control{% if errors.last_name is defined %} is-invalid{% endif %}" 
+                                                   id="last_name" 
+                                                   name="last_name" 
+                                                   value="{{ data.last_name ?? '' }}" 
+                                                   required 
+                                                   maxlength="100"
+                                                   placeholder="Wprowadź nazwisko">
+                                            {% if errors.last_name is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.last_name %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="birthdate" class="form-label required">Data urodzenia</label>
+                                            <input type="date" 
+                                                   class="form-control{% if errors.birthdate is defined %} is-invalid{% endif %}" 
+                                                   id="birthdate" 
+                                                   name="birthdate" 
+                                                   value="{{ data.birthdate ?? '' }}" 
+                                                   required 
+                                                   max="{{ 'now'|date('Y-m-d') }}"
+                                                   min="1900-01-01">
+                                            {% if errors.birthdate is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.birthdate %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                Wybierz datę urodzenia (maksymalnie dzisiejsza data)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="gender" class="form-label required">Płeć</label>
+                                            <select class="form-select{% if errors.gender is defined %} is-invalid{% endif %}" 
+                                                    id="gender" 
+                                                    name="gender" 
+                                                    required>
+                                                <option value="">Wybierz płeć</option>
+                                                <option value="male" {% if data.gender is defined and data.gender == 'male' %}selected{% endif %}>
+                                                    <i class="fas fa-mars"></i> Mężczyzna
+                                                </option>
+                                                <option value="female" {% if data.gender is defined and data.gender == 'female' %}selected{% endif %}>
+                                                    <i class="fas fa-venus"></i> Kobieta
+                                                </option>
+                                            </select>
+                                            {% if errors.gender is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.gender %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="alert alert-info" role="alert">
+                                            <i class="fas fa-info-circle"></i>
+                                            <strong>Informacja:</strong> Wszystkie pola oznaczone gwiazdką (*) są wymagane. 
+                                            Dane zostaną zapisane w systemie Phoenix API.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <hr>
+                                        <div class="d-flex justify-content-between">
+                                            <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
+                                                <i class="fas fa-times"></i> Anuluj
+                                            </a>
+                                            <div>
+                                                <button type="reset" class="btn btn-outline-secondary me-2">
+                                                    <i class="fas fa-undo"></i> Wyczyść formularz
+                                                </button>
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-save"></i> Zapisz użytkownika
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-lightbulb"></i> Wskazówki
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">Wymagania dla pól:</h6>
+                                <ul class="list-unstyled small">
+                                    <li><i class="fas fa-check text-success"></i> Imię: maksymalnie 100 znaków</li>
+                                    <li><i class="fas fa-check text-success"></i> Nazwisko: maksymalnie 100 znaków</li>
+                                    <li><i class="fas fa-check text-success"></i> Data urodzenia: nie może być z przyszłości</li>
+                                    <li><i class="fas fa-check text-success"></i> Płeć: mężczyzna lub kobieta</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-primary">Walidacja:</h6>
+                                <ul class="list-unstyled small">
+                                    <li><i class="fas fa-shield-alt text-info"></i> Wszystkie dane są walidowane</li>
+                                    <li><i class="fas fa-database text-info"></i> Zapis odbywa się przez Phoenix API</li>
+                                    <li><i class="fas fa-exclamation-triangle text-warning"></i> Sprawdź poprawność przed zapisem</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="alert alert-warning" role="alert">
+                                <small>
+                                    <i class="fas fa-info-circle"></i>
+                                    Po zapisaniu użytkownik zostanie dodany do systemu i będzie widoczny na liście użytkowników.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-calculate age based on birthdate
+document.getElementById('birthdate').addEventListener('change', function() {
+    const birthdate = new Date(this.value);
+    const today = new Date();
+    const age = today.getFullYear() - birthdate.getFullYear();
+    const monthDiff = today.getMonth() - birthdate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+        age--;
+    }
+    
+    if (this.value && age >= 0) {
+        const ageInfo = document.createElement('small');
+        ageInfo.className = 'text-muted';
+        ageInfo.textContent = `Wiek: ${age} lat`;
+        
+        // Remove existing age info
+        const existingAge = this.parentNode.querySelector('.age-info');
+        if (existingAge) {
+            existingAge.remove();
+        }
+        
+        ageInfo.className += ' age-info d-block mt-1';
+        this.parentNode.appendChild(ageInfo);
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        const firstInvalid = this.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.focus();
+        }
+    }
+});
+
+// Real-time validation
+document.querySelectorAll('input, select').forEach(field => {
+    field.addEventListener('blur', function() {
+        if (this.hasAttribute('required') && !this.value.trim()) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    field.addEventListener('input', function() {
+        if (this.classList.contains('is-invalid') && this.value.trim()) {
+            this.classList.remove('is-invalid');
+        }
+    });
+});
+</script>
+
+<style>
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #6c757d;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.btn-success {
+    background-color: #1cc88a;
+    border-color: #1cc88a;
+}
+
+.btn-success:hover {
+    background-color: #17a673;
+    border-color: #17a673;
+}
+</style>
+{% endblock %}

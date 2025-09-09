@@ -1,4 +1,4 @@
-FROM elixir:1.19-alpine
+FROM elixir:1.18-alpine
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -27,10 +27,7 @@ COPY . .
 # Compile the project
 RUN mix compile
 
-# Install Node.js dependencies for assets
-RUN cd assets && npm install
-
-# Compile assets
+# Compile assets (Phoenix uses esbuild, no npm needed)
 RUN mix assets.deploy
 
 # Expose port

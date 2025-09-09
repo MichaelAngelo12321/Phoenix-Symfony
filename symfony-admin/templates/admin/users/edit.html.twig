@@ -1,0 +1,446 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edytuj użytkownika - {{ user.first_name }} {{ user.last_name }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('admin_users_index') }}">Użytkownicy</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('admin_users_show', {id: user.id}) }}">{{ user.first_name }} {{ user.last_name }}</a></li>
+                            <li class="breadcrumb-item active">Edycja</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0 text-gray-800">Edytuj użytkownika</h1>
+                </div>
+                <div>
+                    <a href="{{ path('admin_users_show', {id: user.id}) }}" class="btn btn-secondary me-2">
+                        <i class="fas fa-eye"></i> Podgląd
+                    </a>
+                    <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Powrót do listy
+                    </a>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-user-edit"></i> Formularz edycji użytkownika #{{ user.id }}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{{ path('admin_users_update', {id: user.id}) }}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="first_name" class="form-label required">Imię</label>
+                                            <input type="text" 
+                                                   class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" 
+                                                   id="first_name" 
+                                                   name="first_name" 
+                                                   value="{{ data.first_name ?? user.first_name }}" 
+                                                   required 
+                                                   maxlength="100"
+                                                   placeholder="Wprowadź imię">
+                                            {% if errors.first_name is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.first_name %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="last_name" class="form-label required">Nazwisko</label>
+                                            <input type="text" 
+                                                   class="form-control{% if errors.last_name is defined %} is-invalid{% endif %}" 
+                                                   id="last_name" 
+                                                   name="last_name" 
+                                                   value="{{ data.last_name ?? user.last_name }}" 
+                                                   required 
+                                                   maxlength="100"
+                                                   placeholder="Wprowadź nazwisko">
+                                            {% if errors.last_name is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.last_name %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="birthdate" class="form-label required">Data urodzenia</label>
+                                            <input type="date" 
+                                                   class="form-control{% if errors.birthdate is defined %} is-invalid{% endif %}" 
+                                                   id="birthdate" 
+                                                   name="birthdate" 
+                                                   value="{{ data.birthdate ?? user.birthdate }}" 
+                                                   required 
+                                                   max="{{ 'now'|date('Y-m-d') }}"
+                                                   min="1900-01-01">
+                                            {% if errors.birthdate is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.birthdate %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                Aktualna data: {{ user.birthdate|date('d.m.Y') }}
+                                                {% set birthdate = user.birthdate|date('Y-m-d') %}
+                                                {% set now = 'now'|date('Y-m-d') %}
+                                                {% set age = ((now|date('U') - birthdate|date('U')) / (365*24*3600))|round(0, 'floor') %}
+                                                ({{ age }} lat)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="gender" class="form-label required">Płeć</label>
+                                            <select class="form-select{% if errors.gender is defined %} is-invalid{% endif %}" 
+                                                    id="gender" 
+                                                    name="gender" 
+                                                    required>
+                                                <option value="">Wybierz płeć</option>
+                                                <option value="male" {% if (data.gender ?? user.gender) == 'male' %}selected{% endif %}>
+                                                    Mężczyzna
+                                                </option>
+                                                <option value="female" {% if (data.gender ?? user.gender) == 'female' %}selected{% endif %}>
+                                                    Kobieta
+                                                </option>
+                                            </select>
+                                            {% if errors.gender is defined %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in errors.gender %}
+                                                        {{ error }}<br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                Aktualna płeć: 
+                                                {% if user.gender == 'male' %}
+                                                    <span class="badge bg-info">Mężczyzna</span>
+                                                {% else %}
+                                                    <span class="badge bg-pink">Kobieta</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="alert alert-warning" role="alert">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <strong>Uwaga:</strong> Zmiany zostaną zapisane w systemie Phoenix API. 
+                                            Upewnij się, że wszystkie dane są poprawne przed zapisaniem.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <hr>
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <a href="{{ path('admin_users_show', {id: user.id}) }}" class="btn btn-secondary me-2">
+                                                    <i class="fas fa-times"></i> Anuluj
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn btn-outline-danger" 
+                                                        onclick="confirmDelete({{ user.id }}, '{{ user.first_name }} {{ user.last_name }}')">
+                                                    <i class="fas fa-trash"></i> Usuń użytkownika
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <button type="reset" class="btn btn-outline-secondary me-2" onclick="resetToOriginal()">
+                                                    <i class="fas fa-undo"></i> Przywróć oryginalne
+                                                </button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-save"></i> Zapisz zmiany
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle"></i> Informacje o użytkowniku
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">Aktualne dane:</h6>
+                                <ul class="list-unstyled small">
+                                    <li><strong>ID:</strong> #{{ user.id }}</li>
+                                    <li><strong>Imię:</strong> {{ user.first_name }}</li>
+                                    <li><strong>Nazwisko:</strong> {{ user.last_name }}</li>
+                                    <li><strong>Data urodzenia:</strong> {{ user.birthdate|date('d.m.Y') }}</li>
+                                    <li><strong>Płeć:</strong> 
+                                        {% if user.gender == 'male' %}
+                                            <span class="badge bg-info">Mężczyzna</span>
+                                        {% else %}
+                                            <span class="badge bg-pink">Kobieta</span>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-primary">Wymagania:</h6>
+                                <ul class="list-unstyled small">
+                                    <li><i class="fas fa-check text-success"></i> Imię: maksymalnie 100 znaków</li>
+                                    <li><i class="fas fa-check text-success"></i> Nazwisko: maksymalnie 100 znaków</li>
+                                    <li><i class="fas fa-check text-success"></i> Data urodzenia: nie może być z przyszłości</li>
+                                    <li><i class="fas fa-check text-success"></i> Płeć: mężczyzna lub kobieta</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <small>
+                                    <i class="fas fa-database"></i>
+                                    Dane są synchronizowane z Phoenix API. Zmiany będą widoczne natychmiast po zapisaniu.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow mt-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-cogs"></i> Akcje
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ path('admin_users_show', {id: user.id}) }}" class="btn btn-info">
+                                    <i class="fas fa-eye"></i> Podgląd użytkownika
+                                </a>
+                                <a href="{{ path('admin_users_new') }}" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Dodaj nowego użytkownika
+                                </a>
+                                <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-list"></i> Lista wszystkich użytkowników
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Czy na pewno chcesz usunąć użytkownika <strong id="deleteUserName"></strong>?</p>
+                <p class="text-danger"><small>Ta operacja jest nieodwracalna.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store original values
+const originalValues = {
+    first_name: '{{ user.first_name }}',
+    last_name: '{{ user.last_name }}',
+    birthdate: '{{ user.birthdate }}',
+    gender: '{{ user.gender }}'
+};
+
+function resetToOriginal() {
+    document.getElementById('first_name').value = originalValues.first_name;
+    document.getElementById('last_name').value = originalValues.last_name;
+    document.getElementById('birthdate').value = originalValues.birthdate;
+    document.getElementById('gender').value = originalValues.gender;
+    
+    // Remove validation classes
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+}
+
+function confirmDelete(userId, userName) {
+    document.getElementById('deleteUserName').textContent = userName;
+    document.getElementById('deleteForm').action = '/admin/users/' + userId + '/delete';
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+// Auto-calculate age based on birthdate
+document.getElementById('birthdate').addEventListener('change', function() {
+    const birthdate = new Date(this.value);
+    const today = new Date();
+    let age = today.getFullYear() - birthdate.getFullYear();
+    const monthDiff = today.getMonth() - birthdate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+        age--;
+    }
+    
+    if (this.value && age >= 0) {
+        const formText = this.parentNode.querySelector('.form-text');
+        if (formText) {
+            formText.innerHTML = `Nowa data: ${this.value} (${age} lat)`;
+        }
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        const firstInvalid = this.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.focus();
+        }
+    }
+});
+
+// Real-time validation
+document.querySelectorAll('input, select').forEach(field => {
+    field.addEventListener('blur', function() {
+        if (this.hasAttribute('required') && !this.value.trim()) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    field.addEventListener('input', function() {
+        if (this.classList.contains('is-invalid') && this.value.trim()) {
+            this.classList.remove('is-invalid');
+        }
+    });
+});
+
+// Highlight changes
+document.querySelectorAll('input, select').forEach(field => {
+    field.addEventListener('input', function() {
+        const originalValue = originalValues[this.name];
+        if (this.value !== originalValue) {
+            this.classList.add('border-warning');
+        } else {
+            this.classList.remove('border-warning');
+        }
+    });
+});
+</script>
+
+<style>
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.bg-pink {
+    background-color: #e83e8c !important;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #6c757d;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.border-warning {
+    border-color: #f6c23e !important;
+    box-shadow: 0 0 0 0.2rem rgba(246, 194, 62, 0.25) !important;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2e59d9;
+}
+</style>
+{% endblock %}

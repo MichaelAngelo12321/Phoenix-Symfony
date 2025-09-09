@@ -1,0 +1,257 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Szczegóły użytkownika - {{ user.first_name }} {{ user.last_name }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('admin_users_index') }}">Użytkownicy</a></li>
+                            <li class="breadcrumb-item active">{{ user.first_name }} {{ user.last_name }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0 text-gray-800">Szczegóły użytkownika</h1>
+                </div>
+                <div>
+                    <a href="{{ path('admin_users_edit', {id: user.id}) }}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit"></i> Edytuj
+                    </a>
+                    <button type="button" 
+                            class="btn btn-danger me-2" 
+                            onclick="confirmDelete({{ user.id }}, '{{ user.first_name }} {{ user.last_name }}')">
+                        <i class="fas fa-trash"></i> Usuń
+                    </button>
+                    <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Powrót
+                    </a>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-user"></i> Informacje podstawowe
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">ID użytkownika</label>
+                                        <div class="fw-bold fs-5">#{{ user.id }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Płeć</label>
+                                        <div>
+                                            {% if user.gender == 'male' %}
+                                                <span class="badge bg-info fs-6">
+                                                    <i class="fas fa-mars"></i> Mężczyzna
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-pink fs-6">
+                                                    <i class="fas fa-venus"></i> Kobieta
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Imię</label>
+                                        <div class="fw-bold fs-5">{{ user.first_name }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Nazwisko</label>
+                                        <div class="fw-bold fs-5">{{ user.last_name }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Data urodzenia</label>
+                                        <div class="fw-bold fs-5">
+                                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                            {{ user.birthdate|date('d.m.Y') }}
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ user.birthdate|date('l, j F Y')|trans }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Wiek</label>
+                                        <div class="fw-bold fs-5">
+                                            {% set birthdate = user.birthdate|date('Y-m-d') %}
+                                            {% set now = 'now'|date('Y-m-d') %}
+                                            {% set age = ((now|date('U') - birthdate|date('U')) / (365*24*3600))|round(0, 'floor') %}
+                                            <i class="fas fa-birthday-cake text-warning me-2"></i>
+                                            {{ age }} lat
+                                        </div>
+                                        <small class="text-muted">
+                                            {% set this_year_birthday = birthdate|date('m-d') %}
+                                            {% set today = 'now'|date('m-d') %}
+                                            {% set next_birthday = this_year_birthday < today ? (age + 1) ~ '-' ~ this_year_birthday : age ~ '-' ~ this_year_birthday %}
+                                            {% set days_to_birthday = ((next_birthday|date('U') - now|date('U')) / (24*3600))|round(0, 'floor') %}
+                                            {% if days_to_birthday == 0 %}
+                                                🎉 Dziś są urodziny!
+                                            {% elseif days_to_birthday < 30 %}
+                                                Urodziny za {{ days_to_birthday }} dni
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-cogs"></i> Akcje
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ path('admin_users_edit', {id: user.id}) }}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Edytuj użytkownika
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-danger" 
+                                        onclick="confirmDelete({{ user.id }}, '{{ user.first_name }} {{ user.last_name }}')">
+                                    <i class="fas fa-trash"></i> Usuń użytkownika
+                                </button>
+                                <hr>
+                                <a href="{{ path('admin_users_new') }}" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Dodaj nowego użytkownika
+                                </a>
+                                <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-list"></i> Lista wszystkich użytkowników
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow mt-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle"></i> Informacje systemowe
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">
+                                <div class="mb-2">
+                                    <strong>Źródło danych:</strong> Phoenix API
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Endpoint:</strong> /api/users/{{ user.id }}
+                                </div>
+                                <div>
+                                    <strong>Ostatnia aktualizacja:</strong> {{ "now"|date('d.m.Y H:i:s') }}
+                                </div>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Czy na pewno chcesz usunąć użytkownika <strong id="deleteUserName"></strong>?</p>
+                <p class="text-danger"><small>Ta operacja jest nieodwracalna.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(userId, userName) {
+    document.getElementById('deleteUserName').textContent = userName;
+    document.getElementById('deleteForm').action = '/admin/users/' + userId + '/delete';
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+
+<style>
+.bg-pink {
+    background-color: #e83e8c !important;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #6c757d;
+}
+</style>
+{% endblock %}
