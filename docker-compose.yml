@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: phoenix_symfony_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phoenix:
+    build:
+      context: ./phoenix-api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ecto://postgres:postgres@postgres/phoenix_symfony_dev
+      SECRET_KEY_BASE: "your-secret-key-base-here-change-in-production"
+      PHX_HOST: localhost
+      PORT: 4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./phoenix-api:/app
+      - phoenix_deps:/app/deps
+      - phoenix_build:/app/_build
+    command: mix phx.server
+
+  symfony:
+    build:
+      context: ./symfony-admin
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/phoenix_symfony_dev
+      PHOENIX_API_URL: http://phoenix:4000/api
+      APP_ENV: dev
+      APP_SECRET: "your-app-secret-here-change-in-production"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - phoenix
+    volumes:
+      - ./symfony-admin:/var/www/html
+      - symfony_vendor:/var/www/html/vendor
+      - symfony_var:/var/www/html/var
+    command: symfony server:start --host=0.0.0.0 --port=8080
+
+volumes:
+  postgres_data:
+  phoenix_deps:
+  phoenix_build:
+  symfony_vendor:
+  symfony_var:
+
+networks:
+  default:
+    name: phoenix-symfony-network
