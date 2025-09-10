@@ -52,10 +52,10 @@ services:
       - postgres
       - phoenix
     volumes:
-      - ./symfony-admin:/var/www/html
-      - symfony_vendor:/var/www/html/vendor
-      - symfony_var:/var/www/html/var
-    command: symfony server:start --host=0.0.0.0 --port=8080
+      - ./symfony-admin:/var/www
+      - symfony_vendor:/var/www/vendor
+      - symfony_var:/var/www/var
+    command: php -S 0.0.0.0:8080 -t public
 
 volumes:
   postgres_data:

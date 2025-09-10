@@ -17,12 +17,16 @@ use Psr\Log\LoggerInterface;
  */
 class PhoenixApiService
 {
-    private const API_BASE_URL = 'http://localhost:4000/api';
+    private readonly string $apiBaseUrl;
     
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger
-    ) {}
+    ) {
+        $this->apiBaseUrl = $_ENV['PHOENIX_API_URL'] ?? 'http://localhost:4000/api';
+    }
+    
+
 
     /**
      * Get all users from Phoenix API
@@ -33,7 +37,7 @@ class PhoenixApiService
     public function getUsers(): array
     {
         try {
-            $response = $this->httpClient->request('GET', self::API_BASE_URL . '/users', [
+            $response = $this->httpClient->request('GET', $this->apiBaseUrl . '/users', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -82,7 +86,7 @@ class PhoenixApiService
     public function getUser(int $id): array
     {
         try {
-            $response = $this->httpClient->request('GET', self::API_BASE_URL . "/users/{$id}", [
+            $response = $this->httpClient->request('GET', $this->apiBaseUrl . "/users/{$id}", [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -138,7 +142,7 @@ class PhoenixApiService
     public function createUser(array $userData): array
     {
         try {
-            $response = $this->httpClient->request('POST', self::API_BASE_URL . '/users', [
+            $response = $this->httpClient->request('POST', $this->apiBaseUrl . '/users', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -201,7 +205,7 @@ class PhoenixApiService
     public function updateUser(int $id, array $userData): array
     {
         try {
-            $response = $this->httpClient->request('PUT', self::API_BASE_URL . "/users/{$id}", [
+            $response = $this->httpClient->request('PUT', $this->apiBaseUrl . "/users/{$id}", [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -271,7 +275,7 @@ class PhoenixApiService
     public function deleteUser(int $id): bool
     {
         try {
-            $response = $this->httpClient->request('DELETE', self::API_BASE_URL . "/users/{$id}", [
+            $response = $this->httpClient->request('DELETE', $this->apiBaseUrl . "/users/{$id}", [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -323,7 +327,7 @@ class PhoenixApiService
     public function isApiAvailable(): bool
     {
         try {
-            $response = $this->httpClient->request('GET', self::API_BASE_URL . '/users', [
+            $response = $this->httpClient->request('GET', $this->apiBaseUrl . '/users', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',

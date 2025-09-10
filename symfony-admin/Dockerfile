@@ -25,18 +25,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files
-COPY composer.json composer.lock ./
-
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# Copy application code
+# Copy application code first
 COPY . .
+
+# Install dependencies after copying all files
+RUN composer install --optimize-autoloader
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www
-RUN chmod -R 755 /var/www/storage
+RUN chmod +x /var/www/bin/console
+RUN mkdir -p /var/www/var/cache /var/www/var/log
+RUN chmod -R 777 /var/www/var
 
 # Expose port
 EXPOSE 8080
