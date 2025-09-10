@@ -29,15 +29,23 @@ class PhoenixApiService
 
 
     /**
-     * Get all users from Phoenix API
+     * Get all users from Phoenix API with optional filtering and sorting
      * 
+     * @param array<string, mixed> $params Query parameters for filtering and sorting
      * @return array<string, mixed>
      * @throws \Exception
      */
-    public function getUsers(): array
+    public function getUsers(array $params = []): array
     {
         try {
-            $response = $this->httpClient->request('GET', $this->apiBaseUrl . '/users', [
+            $url = $this->apiBaseUrl . '/users';
+            
+            // Add query parameters if provided
+            if (!empty($params)) {
+                $url .= '?' . http_build_query($params);
+            }
+            
+            $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -58,7 +66,8 @@ class PhoenixApiService
             $data = $response->toArray();
             
             $this->logger->info('Successfully fetched users from Phoenix API', [
-                'count' => count($data['data'] ?? [])
+                'count' => count($data['data'] ?? []),
+                'params' => $params
             ]);
             
             return $data;

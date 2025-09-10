@@ -24,18 +24,43 @@ class UserController extends AbstractController
     ) {}
 
     /**
-     * Display list of all users
+     * Display list of all users with filtering and sorting
      */
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
         try {
-            $apiResponse = $this->phoenixApiService->getUsers();
+            // Get filter parameters
+            $filters = [
+                'first_name' => $request->query->get('first_name'),
+                'last_name' => $request->query->get('last_name'),
+                'gender' => $request->query->get('gender'),
+                'birthdate_from' => $request->query->get('birthdate_from'),
+                'birthdate_to' => $request->query->get('birthdate_to'),
+            ];
+            
+            // Get sorting parameters
+            $sortBy = $request->query->get('sort_by', 'id');
+            $sortOrder = $request->query->get('sort_order', 'asc');
+            
+            // Remove empty filters
+            $filters = array_filter($filters, fn($value) => !empty($value));
+            
+            // Add sorting to filters
+            if ($sortBy) {
+                $filters['sort_by'] = $sortBy;
+                $filters['sort_order'] = $sortOrder;
+            }
+            
+            $apiResponse = $this->phoenixApiService->getUsers($filters);
             $users = $apiResponse['data'] ?? [];
             
             return $this->render('admin/users/index.html.twig', [
                 'users' => $users,
                 'api_available' => true,
+                'current_filters' => $request->query->all(),
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
             ]);
             
         } catch (\Exception $e) {
@@ -48,6 +73,9 @@ class UserController extends AbstractController
             return $this->render('admin/users/index.html.twig', [
                 'users' => [],
                 'api_available' => false,
+                'current_filters' => [],
+                'sort_by' => 'id',
+                'sort_order' => 'asc',
             ]);
         }
     }

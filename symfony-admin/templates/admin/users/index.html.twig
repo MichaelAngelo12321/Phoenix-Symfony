@@ -34,9 +34,80 @@
                 </div>
             {% endfor %}
 
-            <div class="card shadow">
+            <!-- Filters Card -->
+            <div class="card shadow mb-4">
                 <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-filter"></i> Filtry i Sortowanie
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ path('admin_users_index') }}" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="first_name" class="form-label">Imię</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ current_filters.first_name ?? '' }}" placeholder="Wpisz imię...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="last_name" class="form-label">Nazwisko</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ current_filters.last_name ?? '' }}" placeholder="Wpisz nazwisko...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="gender" class="form-label">Płeć</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">Wszystkie</option>
+                                <option value="male" {{ current_filters.gender is defined and current_filters.gender == 'male' ? 'selected' : '' }}>Mężczyzna</option>
+                                <option value="female" {{ current_filters.gender is defined and current_filters.gender == 'female' ? 'selected' : '' }}>Kobieta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="birthdate_from" class="form-label">Data od</label>
+                            <input type="date" class="form-control" id="birthdate_from" name="birthdate_from" 
+                                   value="{{ current_filters.birthdate_from ?? '' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="birthdate_to" class="form-label">Data do</label>
+                            <input type="date" class="form-control" id="birthdate_to" name="birthdate_to" 
+                                   value="{{ current_filters.birthdate_to ?? '' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="sort_by" class="form-label">Sortuj według</label>
+                            <select class="form-select" id="sort_by" name="sort_by">
+                                <option value="id" {{ sort_by == 'id' ? 'selected' : '' }}>ID</option>
+                                <option value="first_name" {{ sort_by == 'first_name' ? 'selected' : '' }}>Imię</option>
+                                <option value="last_name" {{ sort_by == 'last_name' ? 'selected' : '' }}>Nazwisko</option>
+                                <option value="birthdate" {{ sort_by == 'birthdate' ? 'selected' : '' }}>Data urodzenia</option>
+                                <option value="gender" {{ sort_by == 'gender' ? 'selected' : '' }}>Płeć</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="sort_order" class="form-label">Kierunek</label>
+                            <select class="form-select" id="sort_order" name="sort_order">
+                                <option value="asc" {{ sort_order == 'asc' ? 'selected' : '' }}>Rosnąco</option>
+                                <option value="desc" {{ sort_order == 'desc' ? 'selected' : '' }}>Malejąco</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search"></i> Filtruj
+                            </button>
+                            <a href="{{ path('admin_users_index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Wyczyść
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Lista Użytkowników</h6>
+                    {% if current_filters|length > 0 %}
+                        <small class="text-muted">
+                            <i class="fas fa-filter"></i> Aktywne filtry: {{ current_filters|length }}
+                        </small>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     {% if users is empty %}
@@ -62,11 +133,61 @@
                             <table class="table table-bordered table-hover">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Imię</th>
-                                        <th>Nazwisko</th>
-                                        <th>Data urodzenia</th>
-                                        <th>Płeć</th>
+                                        <th>
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'id', sort_order: (sort_by == 'id' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                               class="text-decoration-none text-dark d-flex align-items-center">
+                                                ID
+                                                {% if sort_by == 'id' %}
+                                                    <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'first_name', sort_order: (sort_by == 'first_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                               class="text-decoration-none text-dark d-flex align-items-center">
+                                                Imię
+                                                {% if sort_by == 'first_name' %}
+                                                    <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'last_name', sort_order: (sort_by == 'last_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                               class="text-decoration-none text-dark d-flex align-items-center">
+                                                Nazwisko
+                                                {% if sort_by == 'last_name' %}
+                                                    <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'birthdate', sort_order: (sort_by == 'birthdate' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                               class="text-decoration-none text-dark d-flex align-items-center">
+                                                Data urodzenia
+                                                {% if sort_by == 'birthdate' %}
+                                                    <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'gender', sort_order: (sort_by == 'gender' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                               class="text-decoration-none text-dark d-flex align-items-center">
+                                                Płeć
+                                                {% if sort_by == 'gender' %}
+                                                    <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
                                         <th>Wiek</th>
                                         <th class="text-center">Akcje</th>
                                     </tr>
