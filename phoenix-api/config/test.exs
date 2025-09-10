@@ -35,3 +35,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+# Guardian configuration for tests
+config :phoenix_api, PhoenixApi.Guardian,
+  issuer: "phoenix_api",
+  secret_key: "test_secret_key_for_guardian_jwt_tokens_in_test_environment"

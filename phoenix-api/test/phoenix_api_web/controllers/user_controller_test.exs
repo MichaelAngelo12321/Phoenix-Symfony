@@ -2,6 +2,7 @@ defmodule PhoenixApiWeb.UserControllerTest do
   use PhoenixApiWeb.ConnCase
 
   import PhoenixApi.AccountsFixtures
+  import PhoenixApi.AuthHelpers
   alias PhoenixApi.Accounts.User
 
   @create_attrs %{
@@ -19,7 +20,11 @@ defmodule PhoenixApiWeb.UserControllerTest do
   @invalid_attrs %{first_name: nil, last_name: nil, birthdate: nil, gender: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    conn = 
+      conn
+      |> put_req_header("accept", "application/json")
+      |> authenticate_conn()
+    {:ok, conn: conn}
   end
 
   describe "index" do
@@ -85,6 +90,20 @@ defmodule PhoenixApiWeb.UserControllerTest do
       assert_error_sent 404, fn ->
         get(conn, ~p"/api/users/#{user}")
       end
+    end
+  end
+
+  describe "import users" do
+    test "requires authentication", %{conn: conn} do
+      # Remove authentication header
+      conn = 
+        conn
+        |> delete_req_header("authorization")
+        |> post(~p"/api/import")
+      
+      response = json_response(conn, 401)
+      assert response["success"] == false
+      assert response["error"] =~ "Unauthorized"
     end
   end
 

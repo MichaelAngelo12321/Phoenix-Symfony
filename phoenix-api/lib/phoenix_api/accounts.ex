@@ -167,6 +167,28 @@ defmodule PhoenixApi.Accounts do
     User.changeset(user, attrs)
   end
 
+  @doc """
+  Generates random user data for testing purposes.
+  """
+  def generate_random_user do
+    first_names_male = ["Adam", "Bartosz", "Cezary", "Damian", "Emil", "Filip", "Grzegorz", "Henryk", "Igor", "Jakub"]
+    first_names_female = ["Anna", "Barbara", "Celina", "Dorota", "Ewa", "Franciszka", "Grażyna", "Halina", "Irena", "Joanna"]
+    last_names = ["Nowak", "Kowalski", "Wiśniewski", "Dąbrowski", "Lewandowski", "Wójcik", "Kamiński", "Kowalczyk", "Zieliński", "Szymański"]
+    
+    gender = Enum.random(["male", "female"])
+    first_name = case gender do
+      "male" -> Enum.random(first_names_male)
+      "female" -> Enum.random(first_names_female)
+    end
+    
+    %{
+      first_name: first_name,
+      last_name: Enum.random(last_names),
+      gender: gender,
+      birthdate: Date.add(Date.utc_today(), -Enum.random(18..80) * 365)
+    }
+  end
+
   # Private functions to fetch data from dane.gov.pl API
   defp fetch_male_names do
     # Fetch from working dane.gov.pl API endpoint

@@ -61,5 +61,31 @@ defmodule PhoenixApi.AccountsTest do
       user = user_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
+
+    test "create_user with generated data works" do
+      # Test creating user with generated data
+      user_data = Accounts.generate_random_user()
+      
+      assert {:ok, %User{} = user} = Accounts.create_user(user_data)
+      assert user.first_name == user_data.first_name
+      assert user.last_name == user_data.last_name
+      assert user.gender == user_data.gender
+      assert user.birthdate == user_data.birthdate
+    end
+
+    test "generate_random_user/0 creates valid user data" do
+      user_data = Accounts.generate_random_user()
+      
+      assert is_map(user_data)
+      assert Map.has_key?(user_data, :first_name)
+      assert Map.has_key?(user_data, :last_name)
+      assert Map.has_key?(user_data, :gender)
+      assert Map.has_key?(user_data, :birthdate)
+      
+      assert user_data.gender in ["male", "female"]
+      assert is_binary(user_data.first_name)
+      assert is_binary(user_data.last_name)
+      assert %Date{} = user_data.birthdate
+    end
   end
 end
