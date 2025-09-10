@@ -349,6 +349,36 @@ class UserController extends AbstractController
     }
 
     /**
+     * Import users from external API
+     */
+    #[Route('/import', name: 'import', methods: ['POST'])]
+    public function import(SessionInterface $session): Response
+    {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
+        try {
+            $result = $this->phoenixApiService->importUsers($token);
+            
+            $this->addFlash('success', sprintf(
+                'Import zakończony pomyślnie! Zaimportowano %d użytkowników.',
+                $result['count'] ?? 0
+            ));
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to import users via admin panel', [
+                'error' => $e->getMessage()
+            ]);
+            
+            $this->addFlash('error', 'Nie można zaimportować użytkowników: ' . $e->getMessage());
+        }
+        
+        return $this->redirectToRoute('admin_users_index');
+    }
+
+    /**
      * API status check endpoint
      */
     #[Route('/api-status', name: 'api_status', methods: ['GET'])]

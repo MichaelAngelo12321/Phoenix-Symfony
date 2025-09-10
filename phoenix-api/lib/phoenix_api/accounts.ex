@@ -167,43 +167,141 @@ defmodule PhoenixApi.Accounts do
     User.changeset(user, attrs)
   end
 
+  # Private functions to fetch data from dane.gov.pl API
+  defp fetch_male_names do
+    # Fetch from working dane.gov.pl API endpoint
+    case HTTPoison.get("https://api.dane.gov.pl/1.4/resources/63929/data?per_page=100", [], timeout: 10000) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        case Jason.decode(body) do
+          {:ok, %{"data" => records}} when is_list(records) ->
+            names = records
+                   |> Enum.map(fn record -> 
+                      get_in(record, ["attributes", "col1", "val"])
+                   end)
+                   |> Enum.filter(&is_binary/1)
+                   |> Enum.take(100)
+            {:ok, names}
+          _ ->
+            {:ok, get_fallback_male_names()}
+        end
+      _ ->
+        {:ok, get_fallback_male_names()}
+    end
+  end
+
+  defp get_fallback_male_names do
+    ["Adam", "Piotr", "Krzysztof", "Stanisław", "Andrzej", "Tomasz", "Jan", "Paweł", "Michał", "Marcin",
+     "Grzegorz", "Jerzy", "Tadeusz", "Łukasz", "Zbigniew", "Ryszard", "Kazimierz", "Marek", "Marian",
+     "Henryk", "Dariusz", "Mariusz", "Józef", "Wojciech", "Robert", "Rafał", "Jacek", "Janusz", "Mirosław",
+     "Maciej", "Sławomir", "Jarosław", "Kamil", "Wiesław", "Roman", "Władysław", "Leszek", "Bartosz", "Artur",
+     "Daniel", "Sebastian", "Dawid", "Przemysław", "Filip", "Mateusz", "Hubert", "Dominik", "Adrian", "Konrad",
+     "Patryk", "Jakub", "Marcin", "Damian", "Kacper", "Oskar", "Wiktor", "Szymon", "Maksymilian", "Natan"]
+  end
+
+  defp fetch_female_names do
+    # Try to fetch from API, fallback to comprehensive list if fails
+    case HTTPoison.get("https://api.dane.gov.pl/1.4/resources/63924/data?per_page=100", [], timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        case Jason.decode(body) do
+          {:ok, %{"data" => data}} when is_list(data) ->
+            names = data
+            |> Enum.map(fn item -> 
+              get_in(item, ["attributes", "col1", "val"])
+            end)
+            |> Enum.filter(&is_binary/1)
+            {:ok, names}
+          _ ->
+            {:ok, get_fallback_female_names()}
+        end
+      _ ->
+        {:ok, get_fallback_female_names()}
+    end
+  end
+
+  defp get_fallback_female_names do
+    ["Anna", "Maria", "Katarzyna", "Małgorzata", "Agnieszka", "Barbara", "Ewa", "Elżbieta", "Zofia", "Krystyna",
+     "Irena", "Teresa", "Danuta", "Janina", "Stanisława", "Helena", "Halina", "Jadwiga", "Józefa", "Marianna",
+     "Aleksandra", "Monika", "Beata", "Dorota", "Renata", "Grażyna", "Jolanta", "Bożena", "Urszula", "Iwona",
+     "Magdalena", "Joanna", "Wanda", "Genowefa", "Stefania", "Alicja", "Justyna", "Sylwia", "Aneta", "Edyta",
+     "Natalia", "Paulina", "Karolina", "Patrycja", "Ewelina", "Agata", "Marta", "Izabela", "Weronika", "Klaudia",
+     "Julia", "Zuzanna", "Martyna", "Oliwia", "Maja", "Lena", "Amelia", "Hanna", "Gabriela", "Nikola"]
+  end
+
+  defp fetch_male_surnames do
+    # Try to fetch from API, fallback to comprehensive list if fails
+    case HTTPoison.get("https://api.dane.gov.pl/1.4/resources/63892/data?per_page=100", [], timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        case Jason.decode(body) do
+          {:ok, %{"data" => data}} when is_list(data) ->
+            surnames = data
+            |> Enum.map(fn item -> 
+              get_in(item, ["attributes", "col1", "val"])
+            end)
+            |> Enum.filter(&is_binary/1)
+            {:ok, surnames}
+          _ ->
+            {:ok, get_fallback_male_surnames()}
+        end
+      _ ->
+        {:ok, get_fallback_male_surnames()}
+    end
+  end
+
+  defp get_fallback_male_surnames do
+    ["Nowak", "Kowalski", "Wiśniewski", "Wójcik", "Kowalczyk", "Kamiński", "Lewandowski", "Zieliński", "Szymański", "Woźniak",
+     "Dąbrowski", "Kozłowski", "Jankowski", "Mazur", "Wojciechowski", "Kwiatkowski", "Krawczyk", "Kaczmarek", "Piotrowski", "Grabowski",
+     "Nowakowski", "Pawłowski", "Michalski", "Nowicki", "Adamczyk", "Dudek", "Zając", "Wieczorek", "Jabłoński", "Król",
+     "Majewski", "Olszewski", "Jaworski", "Wróbel", "Malinowski", "Pawlak", "Witkowski", "Walczak", "Stępień", "Górski",
+     "Rutkowski", "Michalak", "Sikora", "Ostrowski", "Baran", "Duda", "Szewczyk", "Tomaszewski", "Pietrzak", "Marciniak",
+     "Wróblewski", "Zalewski", "Jakubowski", "Jasiński", "Zawadzki", "Sadowski", "Bąk", "Chmielewski", "Włodarczyk", "Borkowski"]
+  end
+
+  defp fetch_female_surnames do
+    # Try to fetch from API, fallback to comprehensive list if fails
+    case HTTPoison.get("https://api.dane.gov.pl/1.4/resources/63888/data?per_page=100", [], timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        case Jason.decode(body) do
+          {:ok, %{"data" => data}} when is_list(data) ->
+            surnames = data
+            |> Enum.map(fn item -> 
+              get_in(item, ["attributes", "col1", "val"])
+            end)
+            |> Enum.filter(&is_binary/1)
+            {:ok, surnames}
+          _ ->
+            {:ok, get_fallback_female_surnames()}
+        end
+      _ ->
+        {:ok, get_fallback_female_surnames()}
+    end
+  end
+
+  defp get_fallback_female_surnames do
+    ["Nowak", "Kowalska", "Wiśniewska", "Wójcik", "Kowalczyk", "Kamińska", "Lewandowska", "Zielińska", "Szymańska", "Woźniak",
+     "Dąbrowska", "Kozłowska", "Jankowska", "Mazur", "Wojciechowska", "Kwiatkowska", "Krawczyk", "Kaczmarek", "Piotrowska", "Grabowska",
+     "Nowakowska", "Pawłowska", "Michalska", "Nowicka", "Adamczyk", "Dudek", "Zając", "Wieczorek", "Jabłońska", "Król",
+     "Majewska", "Olszewska", "Jaworska", "Wróbel", "Malinowska", "Pawlak", "Witkowska", "Walczak", "Stępień", "Górska",
+     "Rutkowska", "Michalak", "Sikora", "Ostrowska", "Baran", "Duda", "Szewczyk", "Tomaszewska", "Pietrzak", "Marciniak",
+     "Wróblewska", "Zalewska", "Jakubowska", "Jasińska", "Zawadzka", "Sadowska", "Bąk", "Chmielewska", "Włodarczyk", "Borkowska"]
+  end
+
   @doc """
   Imports sample users data.
-  Generates 1000 random users with popular Polish names.
+  Generates 100 random users with names from Polish PESEL registry.
   """
   def import_sample_users do
-    # Popular Polish first names
-    male_names = [
-      "Adam", "Piotr", "Krzysztof", "Stanisław", "Andrzej", "Tomasz", "Jan", "Paweł", "Michał", "Marcin",
-      "Grzegorz", "Jerzy", "Tadeusz", "Adam", "Łukasz", "Zbigniew", "Ryszard", "Kazimierz", "Marek", "Marian",
-      "Henryk", "Dariusz", "Mariusz", "Józef", "Wojciech", "Robert", "Rafał", "Jacek", "Janusz", "Mirosław",
-      "Maciej", "Sławomir", "Jarosław", "Kamil", "Wiesław", "Roman", "Władysław", "Leszek", "Bartosz", "Artur",
-      "Daniel", "Sebastian", "Dawid", "Przemysław", "Filip", "Mateusz", "Hubert", "Dominik", "Adrian", "Konrad"
-    ]
+    # Fetch names and surnames from dane.gov.pl API
+    {:ok, male_names} = fetch_male_names()
+    {:ok, female_names} = fetch_female_names()
+    {:ok, male_surnames} = fetch_male_surnames()
+    {:ok, female_surnames} = fetch_female_surnames()
     
-    female_names = [
-      "Anna", "Maria", "Katarzyna", "Małgorzata", "Agnieszka", "Krystyna", "Barbara", "Ewa", "Elżbieta", "Zofia",
-      "Janina", "Teresa", "Magdalena", "Monika", "Jadwiga", "Danuta", "Irena", "Halina", "Helena", "Beata",
-      "Aleksandra", "Marta", "Dorota", "Marianna", "Grażyna", "Jolanta", "Stanisława", "Iwona", "Karolina", "Bożena",
-      "Urszula", "Justyna", "Renata", "Alicja", "Paulina", "Sylwia", "Natalia", "Wanda", "Joanna", "Edyta",
-      "Patrycja", "Agata", "Aneta", "Izabela", "Ewelina", "Kinga", "Wioletta", "Kamila", "Milena", "Gabriela"
-    ]
-    
-    # Popular Polish surnames
-    surnames = [
-      "Nowak", "Kowalski", "Wiśniewski", "Dąbrowski", "Lewandowski", "Wójcik", "Kamiński", "Kowalczyk", "Zieliński", "Szymański",
-      "Woźniak", "Kozłowski", "Jankowski", "Wojciechowski", "Kwiatkowski", "Kaczmarek", "Mazur", "Krawczyk", "Piotrowski", "Grabowski",
-      "Nowakowski", "Pawłowski", "Michalski", "Nowicki", "Adamczyk", "Dudek", "Zając", "Wieczorek", "Jabłoński", "Król",
-      "Majewski", "Olszewski", "Jaworski", "Wróbel", "Malinowski", "Pawlak", "Witkowski", "Walczak", "Stępień", "Górski",
-      "Rutkowski", "Michalak", "Sikora", "Ostrowski", "Baran", "Duda", "Szewczyk", "Tomaszewski", "Pietrzak", "Marciniak"
-    ]
-    
-    # Generate 1000 random users
-    users_data = for _i <- 1..1000 do
+    # Generate 100 random users
+    users_data = for _i <- 1..100 do
       gender = Enum.random(["male", "female"])
-      first_name = case gender do
-        "male" -> Enum.random(male_names)
-        "female" -> Enum.random(female_names)
+      {first_name, last_name} = case gender do
+        "male" -> {Enum.random(male_names), Enum.random(male_surnames)}
+        "female" -> {Enum.random(female_names), Enum.random(female_surnames)}
       end
       
       # Random birthdate between 1970-01-01 and 2024-12-31
@@ -215,7 +313,7 @@ defmodule PhoenixApi.Accounts do
       
       %{
         first_name: first_name,
-        last_name: Enum.random(surnames),
+        last_name: last_name,
         birthdate: birthdate,
         gender: gender
       }

@@ -42,15 +42,9 @@ defmodule PhoenixApiWeb.UserController do
   end
 
   def import(conn, _params) do
-    case Accounts.import_sample_users() do
-      {:ok, count} ->
-        conn
-        |> put_status(:created)
-        |> json(%{message: "Successfully imported #{count} users", count: count})
-      {:error, reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Failed to import users: #{inspect(reason)}"})
-    end
+    {:ok, count} = Accounts.import_sample_users()
+    conn
+    |> put_status(:created)
+    |> json(%{message: "Successfully imported #{count} users", count: count})
   end
 end

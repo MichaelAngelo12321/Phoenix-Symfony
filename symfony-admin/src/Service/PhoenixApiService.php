@@ -252,6 +252,24 @@ class PhoenixApiService
     }
 
     /**
+     * Import users from external API (dane.gov.pl)
+     * 
+     * @param string $token JWT token for authentication
+     * @return array<string, mixed>
+     * @throws \Exception
+     */
+    public function importUsers(string $token): array
+    {
+        $result = $this->authService->makeAuthenticatedRequest('POST', '/import', $token);
+        
+        if (!isset($result['success']) || !$result['success']) {
+            throw new \Exception($result['error'] ?? 'Import failed');
+        }
+        
+        return $result;
+    }
+
+    /**
      * Check if Phoenix API is available
      * 
      * @return bool
