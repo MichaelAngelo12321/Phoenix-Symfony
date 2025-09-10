@@ -60,6 +60,17 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Guardian configuration
+config :phoenix_api, PhoenixApi.Guardian,
+  issuer: "phoenix_api",
+  secret_key: "your-secret-key-here-change-in-production"
+
+# Admin credentials (hardcoded for security)
+config :phoenix_api, :admin_credentials,
+  email: "admin@example.com",
+  password: "SecureAdminPassword123!",
+  name: "System Administrator"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

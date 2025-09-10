@@ -14,6 +14,11 @@ defmodule PhoenixApiWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :api_auth do
+    plug :accepts, ["json"]
+    plug PhoenixApiWeb.Plugs.AuthPlug
+  end
+
   scope "/", PhoenixApiWeb do
     pipe_through :browser
 
@@ -23,6 +28,15 @@ defmodule PhoenixApiWeb.Router do
   # Other scopes may use custom stacks.
   scope "/api", PhoenixApiWeb do
     pipe_through :api
+
+    # Public auth endpoints
+    post "/auth/login", AuthController, :login
+    post "/auth/verify", AuthController, :verify_token
+  end
+
+  # Protected API endpoints
+  scope "/api", PhoenixApiWeb do
+    pipe_through :api_auth
 
     resources "/users", UserController, except: [:new, :edit]
     post "/import", UserController, :import

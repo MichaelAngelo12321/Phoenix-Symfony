@@ -135,13 +135,18 @@
                         <div class="navbar-nav ms-auto">
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle"></i> Administrator
+                                    <i class="fas fa-user-circle"></i> 
+                                    {% if app.session.get('admin_data') %}
+                                        {{ app.session.get('admin_data').name ?? 'Administrator' }}
+                                    {% else %}
+                                        Administrator
+                                    {% endif %}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Profil</a></li>
                                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Ustawienia</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt"></i> Wyloguj</a></li>
+    
                                 </ul>
                             </div>
                         </div>

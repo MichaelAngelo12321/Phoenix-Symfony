@@ -48,6 +48,11 @@ config :phoenix_api, PhoenixApiWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
+# Guardian configuration for development
+config :phoenix_api, PhoenixApi.Guardian,
+  issuer: "phoenix_api",
+  secret_key: "dev-secret-key-change-in-production-very-long-and-secure-key-here"
+
 # Watch static and templates for browser reloading.
 config :phoenix_api, PhoenixApiWeb.Endpoint,
   live_reload: [

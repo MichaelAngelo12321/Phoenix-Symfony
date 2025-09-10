@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Psr\Log\LoggerInterface;
 
@@ -22,13 +23,33 @@ class UserController extends AbstractController
         private readonly PhoenixApiService $phoenixApiService,
         private readonly LoggerInterface $logger
     ) {}
+    
+    /**
+     * Get JWT token from session or redirect to login
+     */
+    private function getTokenOrRedirect(SessionInterface $session): string|Response
+    {
+        $token = $session->get('admin_token');
+        
+        if (!$token) {
+            $this->addFlash('error', 'Musisz się zalogować, aby uzyskać dostęp do tej strony.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        return $token;
+    }
 
     /**
      * Display list of all users with filtering and sorting
      */
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(Request $request): Response
+    public function index(Request $request, SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         try {
             // Get filter parameters
             $filters = [
@@ -52,7 +73,7 @@ class UserController extends AbstractController
                 $filters['sort_order'] = $sortOrder;
             }
             
-            $apiResponse = $this->phoenixApiService->getUsers($filters);
+            $apiResponse = $this->phoenixApiService->getUsers($token, $filters);
             $users = $apiResponse['data'] ?? [];
             
             return $this->render('admin/users/index.html.twig', [
@@ -84,10 +105,15 @@ class UserController extends AbstractController
      * Show user details
      */
     #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id): Response
+    public function show(int $id, SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         try {
-            $apiResponse = $this->phoenixApiService->getUser($id);
+            $apiResponse = $this->phoenixApiService->getUser($token, $id);
             $user = $apiResponse['data'] ?? null;
             
             if (!$user) {
@@ -114,8 +140,13 @@ class UserController extends AbstractController
      * Show form for creating new user
      */
     #[Route('/new', name: 'new', methods: ['GET'])]
-    public function new(): Response
+    public function new(SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         return $this->render('admin/users/new.html.twig');
     }
 
@@ -123,8 +154,13 @@ class UserController extends AbstractController
      * Handle user creation
      */
     #[Route('/create', name: 'create', methods: ['POST'])]
-    public function create(Request $request): Response
+    public function create(Request $request, SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         $userData = [
             'first_name' => $request->request->get('first_name'),
             'last_name' => $request->request->get('last_name'),
@@ -157,7 +193,7 @@ class UserController extends AbstractController
         }
         
         try {
-            $apiResponse = $this->phoenixApiService->createUser($userData);
+            $apiResponse = $this->phoenixApiService->createUser($token, $userData);
             $user = $apiResponse['data'] ?? null;
             
             if ($user) {
@@ -185,10 +221,15 @@ class UserController extends AbstractController
      * Show form for editing user
      */
     #[Route('/{id}/edit', name: 'edit', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function edit(int $id): Response
+    public function edit(int $id, SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         try {
-            $apiResponse = $this->phoenixApiService->getUser($id);
+            $apiResponse = $this->phoenixApiService->getUser($token, $id);
             $user = $apiResponse['data'] ?? null;
             
             if (!$user) {
@@ -215,8 +256,13 @@ class UserController extends AbstractController
      * Handle user update
      */
     #[Route('/{id}/update', name: 'update', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function update(int $id, Request $request): Response
+    public function update(int $id, Request $request, SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         $userData = [
             'first_name' => $request->request->get('first_name'),
             'last_name' => $request->request->get('last_name'),
@@ -249,7 +295,7 @@ class UserController extends AbstractController
         }
         
         try {
-            $apiResponse = $this->phoenixApiService->updateUser($id, $userData);
+            $apiResponse = $this->phoenixApiService->updateUser($token, $id, $userData);
             $user = $apiResponse['data'] ?? null;
             
             if ($user) {
@@ -278,10 +324,15 @@ class UserController extends AbstractController
      * Handle user deletion
      */
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function delete(int $id): Response
+    public function delete(int $id, SessionInterface $session): Response
     {
+        $token = $this->getTokenOrRedirect($session);
+        if ($token instanceof Response) {
+            return $token;
+        }
+        
         try {
-            $this->phoenixApiService->deleteUser($id);
+            $this->phoenixApiService->deleteUser($token, $id);
             
             $this->addFlash('success', 'Użytkownik został pomyślnie usunięty.');
             
