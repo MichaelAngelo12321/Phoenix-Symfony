@@ -13,7 +13,7 @@ defmodule PhoenixApi.AccountsFixtures do
       |> Enum.into(%{
         birthdate: ~D[1990-01-01],
         first_name: "some first_name",
-        gender: "male",
+        gender: :male,
         last_name: "some last_name"
       })
       |> PhoenixApi.Accounts.create_user()

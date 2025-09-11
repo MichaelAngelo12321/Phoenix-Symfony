@@ -7,6 +7,9 @@ services:
       POSTGRES_DB: phoenix_symfony_dev
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      LC_COLLATE: pl_PL.UTF-8
+      LC_CTYPE: pl_PL.UTF-8
+      POSTGRES_INITDB_ARGS: "--locale=pl_PL.UTF-8 --encoding=UTF8"
     ports:
       - "5432:5432"
     volumes:

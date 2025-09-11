@@ -21,13 +21,13 @@ defmodule PhoenixApi.AccountsTest do
     end
 
     test "create_user/1 with valid data creates a user" do
-      valid_attrs = %{first_name: "some first_name", last_name: "some last_name", birthdate: ~D[1990-01-01], gender: "male"}
+      valid_attrs = %{first_name: "some first_name", last_name: "some last_name", birthdate: ~D[1990-01-01], gender: :male}
 
       assert {:ok, %User{} = user} = Accounts.create_user(valid_attrs)
       assert user.first_name == "some first_name"
       assert user.last_name == "some last_name"
       assert user.birthdate == ~D[1990-01-01]
-      assert user.gender == "male"
+      assert user.gender == :male
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -36,13 +36,13 @@ defmodule PhoenixApi.AccountsTest do
 
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
-      update_attrs = %{first_name: "some updated first_name", last_name: "some updated last_name", birthdate: ~D[1985-05-15], gender: "female"}
+      update_attrs = %{first_name: "some updated first_name", last_name: "some updated last_name", birthdate: ~D[1985-05-15], gender: :female}
 
       assert {:ok, %User{} = user} = Accounts.update_user(user, update_attrs)
       assert user.first_name == "some updated first_name"
       assert user.last_name == "some updated last_name"
       assert user.birthdate == ~D[1985-05-15]
-      assert user.gender == "female"
+      assert user.gender == :female
     end
 
     test "update_user/2 with invalid data returns error changeset" do

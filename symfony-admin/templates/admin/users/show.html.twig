@@ -107,29 +107,7 @@
                                         </small>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted">Wiek</label>
-                                        <div class="fw-bold fs-5">
-                                            {% set birthdate = user.birthdate|date('Y-m-d') %}
-                                            {% set now = 'now'|date('Y-m-d') %}
-                                            {% set age = ((now|date('U') - birthdate|date('U')) / (365*24*3600))|round(0, 'floor') %}
-                                            <i class="fas fa-birthday-cake text-warning me-2"></i>
-                                            {{ age }} lat
-                                        </div>
-                                        <small class="text-muted">
-                                            {% set this_year_birthday = birthdate|date('m-d') %}
-                                            {% set today = 'now'|date('m-d') %}
-                                            {% set next_birthday = this_year_birthday < today ? (age + 1) ~ '-' ~ this_year_birthday : age ~ '-' ~ this_year_birthday %}
-                                            {% set days_to_birthday = ((next_birthday|date('U') - now|date('U')) / (24*3600))|round(0, 'floor') %}
-                                            {% if days_to_birthday == 0 %}
-                                                🎉 Dziś są urodziny!
-                                            {% elseif days_to_birthday < 30 %}
-                                                Urodziny za {{ days_to_birthday }} dni
-                                            {% endif %}
-                                        </small>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>

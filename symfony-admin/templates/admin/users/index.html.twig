@@ -146,7 +146,7 @@
                                         <th>
                                             <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'id', sort_order: (sort_by == 'id' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
                                                class="text-decoration-none text-dark d-flex align-items-center">
-                                                ID
+                                                Lp.
                                                 {% if sort_by == 'id' %}
                                                     <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                                 {% else %}
@@ -198,16 +198,16 @@
                                                 {% endif %}
                                             </a>
                                         </th>
-                                        <th>Wiek</th>
+
                                         <th class="text-center">Akcje</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for user in users %}
                                         <tr>
-                                            <td class="fw-bold">#{{ user.id }}</td>
-                                            <td>{{ user.first_name }}</td>
-                                            <td>{{ user.last_name }}</td>
+                                            <td class="fw-bold">{{ loop.index }}</td>
+                                            <td>{{ user.first_name|upper }}</td>
+                                            <td>{{ user.last_name|upper }}</td>
                                             <td>
                                                 {{ user.birthdate|date('d.m.Y') }}
                                             </td>
@@ -218,12 +218,7 @@
                                                     <span class="badge bg-pink">Kobieta</span>
                                                 {% endif %}
                                             </td>
-                                            <td>
-                                                {% set birthdate = user.birthdate|date('Y-m-d') %}
-                                                {% set now = 'now'|date('Y-m-d') %}
-                                                {% set age = ((now|date('U') - birthdate|date('U')) / (365*24*3600))|round(0, 'floor') %}
-                                                {{ age }} lat
-                                            </td>
+
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ path('admin_users_show', {id: user.id}) }}" 

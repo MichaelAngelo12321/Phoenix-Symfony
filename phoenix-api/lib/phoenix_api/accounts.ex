@@ -43,7 +43,8 @@ defmodule PhoenixApi.Accounts do
   defp filter_by_last_name(query, _), do: query
 
   defp filter_by_gender(query, %{"gender" => gender}) when gender in ["male", "female"] do
-    from u in query, where: u.gender == ^gender
+    gender_atom = String.to_existing_atom(gender)
+    from u in query, where: u.gender == ^gender_atom
   end
   defp filter_by_gender(query, _), do: query
 
@@ -73,15 +74,17 @@ defmodule PhoenixApi.Accounts do
   defp filter_by_birthdate_range(query, _), do: query
 
   defp apply_sorting(query, %{"sort_by" => sort_field, "sort_order" => sort_order}) 
-       when sort_field in ["first_name", "last_name", "birthdate", "gender"] and 
+       when sort_field in ["id", "first_name", "last_name", "birthdate", "gender"] and 
             sort_order in ["asc", "desc"] do
     field = String.to_atom(sort_field)
     order = String.to_atom(sort_order)
+    
     from u in query, order_by: [{^order, field(u, ^field)}]
   end
   defp apply_sorting(query, %{"sort_by" => sort_field}) 
-       when sort_field in ["first_name", "last_name", "birthdate", "gender"] do
+       when sort_field in ["id", "first_name", "last_name", "birthdate", "gender"] do
     field = String.to_atom(sort_field)
+    
     from u in query, order_by: [asc: field(u, ^field)]
   end
   defp apply_sorting(query, _), do: from(u in query, order_by: [asc: u.id])
@@ -320,10 +323,10 @@ defmodule PhoenixApi.Accounts do
     
     # Generate 100 random users
     users_data = for _i <- 1..100 do
-      gender = Enum.random(["male", "female"])
+      gender = Enum.random([:male, :female])
       {first_name, last_name} = case gender do
-        "male" -> {Enum.random(male_names), Enum.random(male_surnames)}
-        "female" -> {Enum.random(female_names), Enum.random(female_surnames)}
+        :male -> {Enum.random(male_names), Enum.random(male_surnames)}
+        :female -> {Enum.random(female_names), Enum.random(female_surnames)}
       end
       
       # Random birthdate between 1970-01-01 and 2024-12-31

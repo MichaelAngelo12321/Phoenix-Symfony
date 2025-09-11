@@ -46,46 +46,20 @@
                             </h6>
                         </div>
                         <div class="card-body">
-                            <form method="post" action="{{ path('admin_users_create') }}" novalidate>
+                            {{ form_start(form, {'action': path('admin_users_new'), 'method': 'POST', 'attr': {'novalidate': 'novalidate'}}) }}
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="first_name" class="form-label required">Imię</label>
-                                            <input type="text" 
-                                                   class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" 
-                                                   id="first_name" 
-                                                   name="first_name" 
-                                                   value="{{ data.first_name ?? '' }}" 
-                                                   required 
-                                                   maxlength="100"
-                                                   placeholder="Wprowadź imię">
-                                            {% if errors.first_name is defined %}
-                                                <div class="invalid-feedback">
-                                                    {% for error in errors.first_name %}
-                                                        {{ error }}<br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
+                                            {{ form_label(form.first_name, 'Imię', {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.first_name, {'attr': {'class': 'form-control', 'placeholder': 'Wprowadź imię', 'maxlength': '100'}}) }}
+                                            {{ form_errors(form.first_name) }}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="last_name" class="form-label required">Nazwisko</label>
-                                            <input type="text" 
-                                                   class="form-control{% if errors.last_name is defined %} is-invalid{% endif %}" 
-                                                   id="last_name" 
-                                                   name="last_name" 
-                                                   value="{{ data.last_name ?? '' }}" 
-                                                   required 
-                                                   maxlength="100"
-                                                   placeholder="Wprowadź nazwisko">
-                                            {% if errors.last_name is defined %}
-                                                <div class="invalid-feedback">
-                                                    {% for error in errors.last_name %}
-                                                        {{ error }}<br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
+                                            {{ form_label(form.last_name, 'Nazwisko', {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.last_name, {'attr': {'class': 'form-control', 'placeholder': 'Wprowadź nazwisko', 'maxlength': '100'}}) }}
+                                            {{ form_errors(form.last_name) }}
                                         </div>
                                     </div>
                                 </div>
@@ -93,22 +67,9 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="birthdate" class="form-label required">Data urodzenia</label>
-                                            <input type="date" 
-                                                   class="form-control{% if errors.birthdate is defined %} is-invalid{% endif %}" 
-                                                   id="birthdate" 
-                                                   name="birthdate" 
-                                                   value="{{ data.birthdate ?? '' }}" 
-                                                   required 
-                                                   max="{{ 'now'|date('Y-m-d') }}"
-                                                   min="1900-01-01">
-                                            {% if errors.birthdate is defined %}
-                                                <div class="invalid-feedback">
-                                                    {% for error in errors.birthdate %}
-                                                        {{ error }}<br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
+                                            {{ form_label(form.birthdate, 'Data urodzenia', {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.birthdate, {'attr': {'class': 'form-control', 'max': 'now'|date('Y-m-d'), 'min': '1900-01-01'}}) }}
+                                            {{ form_errors(form.birthdate) }}
                                             <div class="form-text">
                                                 Wybierz datę urodzenia (maksymalnie dzisiejsza data)
                                             </div>
@@ -116,26 +77,9 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="gender" class="form-label required">Płeć</label>
-                                            <select class="form-select{% if errors.gender is defined %} is-invalid{% endif %}" 
-                                                    id="gender" 
-                                                    name="gender" 
-                                                    required>
-                                                <option value="">Wybierz płeć</option>
-                                                <option value="male" {% if data.gender is defined and data.gender == 'male' %}selected{% endif %}>
-                                                    <i class="fas fa-mars"></i> Mężczyzna
-                                                </option>
-                                                <option value="female" {% if data.gender is defined and data.gender == 'female' %}selected{% endif %}>
-                                                    <i class="fas fa-venus"></i> Kobieta
-                                                </option>
-                                            </select>
-                                            {% if errors.gender is defined %}
-                                                <div class="invalid-feedback">
-                                                    {% for error in errors.gender %}
-                                                        {{ error }}<br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
+                                            {{ form_label(form.gender, 'Płeć', {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.gender, {'attr': {'class': 'form-select'}}) }}
+                                            {{ form_errors(form.gender) }}
                                         </div>
                                     </div>
                                 </div>
@@ -161,14 +105,12 @@
                                                 <button type="reset" class="btn btn-outline-secondary me-2">
                                                     <i class="fas fa-undo"></i> Wyczyść formularz
                                                 </button>
-                                                <button type="submit" class="btn btn-success">
-                                                    <i class="fas fa-save"></i> Zapisz użytkownika
-                                                </button>
+                                                {{ form_widget(form.submit, {'attr': {'class': 'btn btn-success'}}) }}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+                            {{ form_end(form) }}
                         </div>
                     </div>
                 </div>

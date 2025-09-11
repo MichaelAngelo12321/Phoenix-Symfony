@@ -6,7 +6,7 @@ defmodule PhoenixApi.Accounts.User do
     field :first_name, :string
     field :last_name, :string
     field :birthdate, :date
-    field :gender, :string
+    field :gender, Ecto.Enum, values: [:male, :female]
 
     timestamps(type: :utc_datetime)
   end
@@ -18,7 +18,7 @@ defmodule PhoenixApi.Accounts.User do
     |> validate_required([:first_name, :last_name, :birthdate, :gender])
     |> validate_length(:first_name, min: 2, max: 50)
     |> validate_length(:last_name, min: 2, max: 50)
-    |> validate_inclusion(:gender, ["male", "female"])
+    |> validate_inclusion(:gender, [:male, :female])
     |> validate_birthdate()
   end
 

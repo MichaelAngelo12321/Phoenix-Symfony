@@ -9,13 +9,13 @@ defmodule PhoenixApiWeb.UserControllerTest do
     first_name: "some first_name",
     last_name: "some last_name",
     birthdate: ~D[2025-09-08],
-    gender: "male"
+    gender: :male
   }
   @update_attrs %{
     first_name: "some updated first_name",
     last_name: "some updated last_name",
     birthdate: ~D[2025-09-09],
-    gender: "female"
+    gender: :female
   }
   @invalid_attrs %{first_name: nil, last_name: nil, birthdate: nil, gender: nil}
 
