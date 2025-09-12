@@ -25,7 +25,14 @@ git clone git@github.com:MichaelAngelo12321/Phoenix-Symfony.git
 cd Phoenix-Symfony
 ```
 
-### 2. Uruchomienie środowiska
+### 2. Konfiguracja Symfony
+
+```bash
+# Skopiowanie pliku środowiskowego
+cp symfony-admin/.env.dev symfony-admin/.env
+```
+
+### 3. Uruchomienie środowiska
 
 ```bash
 # Budowanie i uruchomienie wszystkich serwisów
@@ -35,19 +42,6 @@ docker-compose up -d
 docker-compose ps
 ```
 
-### 3. Instalacja zależności w kontenerach
-
-```bash
-# Instalacja zależności Phoenix (Elixir) w kontenerze
-docker-compose exec phoenix mix deps.get
-
-# Instalacja zależności Symfony (PHP) w kontenerze
-docker-compose exec symfony composer install
-
-# Skopiowanie pliku konfiguracyjnego środowiska
-docker-compose exec symfony cp .env.dev .env
-```
-
 ### 4. Inicjalizacja bazy danych
 
 ```bash
@@ -55,11 +49,26 @@ docker-compose exec symfony cp .env.dev .env
 docker-compose exec phoenix mix ecto.migrate
 ```
 
-### 5. Dostęp do aplikacji
+### 5. Finalizacja konfiguracji Symfony
+
+```bash
+# Instalacja vendor assets dla Symfony
+docker-compose exec symfony php bin/console importmap:install
+```
+
+### 6. Dostęp do aplikacji
 
 - **Phoenix API**: http://localhost:4000
 - **Symfony Admin**: http://localhost:8080
 - **PostgreSQL**: localhost:5432 (postgres/postgres)
+
+### 🔐 Dane logowania administratora
+
+**Panel administracyjny Symfony** (http://localhost:8080):
+- **Login**: `admin@example.com`
+- **Hasło**: `SecureAdminPassword123!`
+
+> ⚠️ **Uwaga**: W środowisku produkcyjnym należy zmienić domyślne dane logowania!
 
 ## 📁 Struktura projektu
 
