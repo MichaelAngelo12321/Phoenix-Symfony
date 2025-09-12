@@ -21,7 +21,7 @@ Projekt demonstracyjny łączący Phoenix (Elixir) jako backend API z Symfony (P
 ### 1. Klonowanie repozytorium
 
 ```bash
-git clone <repository-url>
+git clone git@github.com:MichaelAngelo12321/Phoenix-Symfony.git
 cd Phoenix-Symfony
 ```
 
@@ -43,6 +43,9 @@ docker-compose exec phoenix mix deps.get
 
 # Instalacja zależności Symfony (PHP) w kontenerze
 docker-compose exec symfony composer install
+
+# Skopiowanie pliku konfiguracyjnego środowiska
+docker-compose exec symfony cp .env.dev .env
 ```
 
 ### 4. Inicjalizacja bazy danych
