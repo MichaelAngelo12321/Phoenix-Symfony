@@ -95,7 +95,6 @@ defmodule PhoenixApiWeb.UserControllerTest do
 
   describe "import users" do
     test "requires authentication", %{conn: conn} do
-      # Remove authentication header
       conn = 
         conn
         |> delete_req_header("authorization")

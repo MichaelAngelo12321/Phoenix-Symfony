@@ -10,7 +10,6 @@ defmodule PhoenixApi.AuthHelpers do
   Creates a JWT token for testing purposes
   """
   def create_jwt_token(email \\ "admin@example.com") do
-    # Create a user struct that matches Guardian expectations
     user = %{email: email}
     case Guardian.encode_and_sign(user) do
       {:ok, token, _claims} -> token

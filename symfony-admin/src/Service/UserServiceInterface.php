@@ -65,9 +65,4 @@ interface UserServiceInterface
      * Import users from external source
      */
     public function importUsers(string $token): array;
-
-    /**
-     * Check API status
-     */
-    public function checkApiStatus(): array;
 }

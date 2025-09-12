@@ -4,72 +4,65 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Service\PhoenixAuthService;
+use App\Constants\AuthConstants;
+use App\Service\PhoenixAuthServiceInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class AuthenticationListener
+final class AuthenticationListener
 {
-    private PhoenixAuthService $phoenixAuthService;
-    private UrlGeneratorInterface $urlGenerator;
     private array $publicRoutes = [
-        'app_login',
-        'app_logout',
+        AuthConstants::ROUTE_LOGIN,
+        AuthConstants::ROUTE_LOGOUT,
         'app_check_auth',
     ];
 
     public function __construct(
-        PhoenixAuthService $phoenixAuthService,
-        UrlGeneratorInterface $urlGenerator
+        private readonly PhoenixAuthServiceInterface $phoenixAuthService,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly RequestStack $requestStack
     ) {
-        $this->phoenixAuthService = $phoenixAuthService;
-        $this->urlGenerator = $urlGenerator;
     }
 
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        $session = $request->getSession();
 
-        // Skip authentication for public routes
         $routeName = $request->attributes->get('_route');
         if (in_array($routeName, $this->publicRoutes) || ! $routeName) {
             return;
         }
 
-        // Skip authentication for non-admin routes (if any)
         if (! str_starts_with($routeName, 'admin_') && $routeName !== 'app_check_auth') {
             return;
         }
 
-        $token = $session->get('admin_token');
+        $session = $this->requestStack->getSession();
+        $token = $session->get(AuthConstants::SESSION_ADMIN_TOKEN);
 
-        // No token found, redirect to login
         if (! $token) {
-            $loginUrl = $this->urlGenerator->generate('app_login');
+            $loginUrl = $this->urlGenerator->generate(AuthConstants::ROUTE_LOGIN);
             $response = new RedirectResponse($loginUrl);
             $event->setResponse($response);
             return;
         }
 
-        // Verify token with Phoenix API
         $result = $this->phoenixAuthService->verifyToken($token);
 
-        if (! $result['success'] || ! $result['valid']) {
-            // Token is invalid, clear session and redirect to login
-            $session->remove('admin_token');
-            $session->remove('admin_data');
+        if (! $result->isValid()) {
+            $session->remove(AuthConstants::SESSION_ADMIN_TOKEN);
+            $session->remove(AuthConstants::SESSION_ADMIN_DATA);
 
-            $loginUrl = $this->urlGenerator->generate('app_login');
+            $loginUrl = $this->urlGenerator->generate(AuthConstants::ROUTE_LOGIN);
             $response = new RedirectResponse($loginUrl);
             $event->setResponse($response);
             return;
         }
 
-        // Update admin data in session if provided
-        if (isset($result['admin'])) {
-            $session->set('admin_data', $result['admin']);
+        if ($result->admin) {
+            $session->set(AuthConstants::SESSION_ADMIN_DATA, $result->admin);
         }
     }
 }

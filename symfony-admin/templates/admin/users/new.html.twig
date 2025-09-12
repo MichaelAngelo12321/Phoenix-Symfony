@@ -46,19 +46,19 @@
                             </h6>
                         </div>
                         <div class="card-body">
-                            {{ form_start(form, {'action': path('admin_users_new'), 'method': 'POST', 'attr': {'novalidate': 'novalidate'}}) }}
+                            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            {{ form_label(form.first_name, 'Imię', {'label_attr': {'class': 'form-label required'}}) }}
-                                            {{ form_widget(form.first_name, {'attr': {'class': 'form-control', 'placeholder': 'Wprowadź imię', 'maxlength': '100'}}) }}
+                                            {{ form_label(form.first_name, null, {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.first_name, {'attr': {'class': 'form-control', 'placeholder': 'Wprowadź imię'}}) }}
                                             {{ form_errors(form.first_name) }}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            {{ form_label(form.last_name, 'Nazwisko', {'label_attr': {'class': 'form-label required'}}) }}
-                                            {{ form_widget(form.last_name, {'attr': {'class': 'form-control', 'placeholder': 'Wprowadź nazwisko', 'maxlength': '100'}}) }}
+                                            {{ form_label(form.last_name, null, {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.last_name, {'attr': {'class': 'form-control', 'placeholder': 'Wprowadź nazwisko'}}) }}
                                             {{ form_errors(form.last_name) }}
                                         </div>
                                     </div>
@@ -67,8 +67,8 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            {{ form_label(form.birthdate, 'Data urodzenia', {'label_attr': {'class': 'form-label required'}}) }}
-                                            {{ form_widget(form.birthdate, {'attr': {'class': 'form-control', 'max': 'now'|date('Y-m-d'), 'min': '1900-01-01'}}) }}
+                                            {{ form_label(form.birthdate, null, {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_widget(form.birthdate, {'attr': {'class': 'form-control'}}) }}
                                             {{ form_errors(form.birthdate) }}
                                             <div class="form-text">
                                                 Wybierz datę urodzenia (maksymalnie dzisiejsza data)
@@ -77,9 +77,10 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            {{ form_label(form.gender, 'Płeć', {'label_attr': {'class': 'form-label required'}}) }}
+                                            {{ form_label(form.gender, null, {'label_attr': {'class': 'form-label required'}}) }}
                                             {{ form_widget(form.gender, {'attr': {'class': 'form-select'}}) }}
                                             {{ form_errors(form.gender) }}
+
                                         </div>
                                     </div>
                                 </div>
@@ -105,7 +106,9 @@
                                                 <button type="reset" class="btn btn-outline-secondary me-2">
                                                     <i class="fas fa-undo"></i> Wyczyść formularz
                                                 </button>
-                                                {{ form_widget(form.submit, {'attr': {'class': 'btn btn-success'}}) }}
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-save"></i> Zapisz użytkownika
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -126,10 +129,10 @@
                             <div class="mb-3">
                                 <h6 class="text-primary">Wymagania dla pól:</h6>
                                 <ul class="list-unstyled small">
-                                    <li><i class="fas fa-check text-success"></i> Imię: maksymalnie 100 znaków</li>
-                                    <li><i class="fas fa-check text-success"></i> Nazwisko: maksymalnie 100 znaków</li>
-                                    <li><i class="fas fa-check text-success"></i> Data urodzenia: nie może być z przyszłości</li>
-                                    <li><i class="fas fa-check text-success"></i> Płeć: mężczyzna lub kobieta</li>
+                                    <li><i class="fas fa-check text-success"></i> Imię: 2-50 znaków, tylko litery</li>
+                                    <li><i class="fas fa-check text-success"></i> Nazwisko: 2-50 znaków, litery, spacje, myślniki</li>
+                                    <li><i class="fas fa-check text-success"></i> Data urodzenia: między 1900 a dzisiaj</li>
+                                    <li><i class="fas fa-check text-success"></i> Płeć: wybierz odpowiednią opcję</li>
                                 </ul>
                             </div>
                             
@@ -157,32 +160,7 @@
 </div>
 
 <script>
-// Auto-calculate age based on birthdate
-document.getElementById('birthdate').addEventListener('change', function() {
-    const birthdate = new Date(this.value);
-    const today = new Date();
-    const age = today.getFullYear() - birthdate.getFullYear();
-    const monthDiff = today.getMonth() - birthdate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
-        age--;
-    }
-    
-    if (this.value && age >= 0) {
-        const ageInfo = document.createElement('small');
-        ageInfo.className = 'text-muted';
-        ageInfo.textContent = `Wiek: ${age} lat`;
-        
-        // Remove existing age info
-        const existingAge = this.parentNode.querySelector('.age-info');
-        if (existingAge) {
-            existingAge.remove();
-        }
-        
-        ageInfo.className += ' age-info d-block mt-1';
-        this.parentNode.appendChild(ageInfo);
-    }
-});
+
 
 // Form validation
 document.querySelector('form').addEventListener('submit', function(e) {

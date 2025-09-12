@@ -34,7 +34,4 @@ defmodule PhoenixApiWeb.AuthControllerTest do
       assert response["error"] == "Email and password are required"
     end
   end
-
-  # Note: /api/auth/verify endpoint is not implemented yet
-  # Tests for verify endpoint would go here when implemented
 end

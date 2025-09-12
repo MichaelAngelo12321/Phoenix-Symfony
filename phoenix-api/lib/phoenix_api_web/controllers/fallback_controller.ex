@@ -6,7 +6,6 @@ defmodule PhoenixApiWeb.FallbackController do
   """
   use PhoenixApiWeb, :controller
 
-  # This clause handles changeset validation errors.
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -14,7 +13,6 @@ defmodule PhoenixApiWeb.FallbackController do
     |> render(:error, changeset: changeset)
   end
 
-  # This clause is an example of how to handle resources that cannot be found.
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)

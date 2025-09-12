@@ -8,12 +8,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * Service for communicating with Phoenix API
- *
- * Handles all HTTP communication with the Phoenix backend API,
- * including user management operations and error handling.
- */
 final readonly class PhoenixApiService implements PhoenixApiServiceInterface
 {
     public function __construct(
@@ -26,11 +20,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     }
 
     /**
-     * Get all users from Phoenix API with optional filtering and sorting
-     *
-     * @param string $token JWT token for authentication
-     * @param array<string, mixed> $params Query parameters for filtering and sorting
-     *
      * @return array<string, mixed>
      *
      * @throws \Exception
@@ -39,7 +28,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     {
         $endpoint = '/users';
 
-        // Add query parameters if provided
         if (count($params) > 0) {
             $endpoint .= '?' . http_build_query($params);
         }
@@ -70,10 +58,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     }
 
     /**
-     * Get a specific user by ID from Phoenix API
-     *
-     * @param string $token JWT token for authentication
-     *
      * @return array<string, mixed>
      *
      * @throws \Exception
@@ -111,11 +95,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     }
 
     /**
-     * Create new user
-     *
-     * @param string $token JWT token for API authentication
-     * @param array<string, mixed> $userData User data to create
-     *
      * @return array{success: bool, data: array|null, error: string|null, status_code: int}
      *
      * @throws \Exception
@@ -159,11 +138,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     }
 
     /**
-     * Update an existing user via Phoenix API
-     *
-     * @param string $token JWT token for authentication
-     * @param array<string, mixed> $userData
-     *
      * @return array<string, mixed>
      *
      * @throws \Exception
@@ -214,10 +188,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     }
 
     /**
-     * Delete a user via Phoenix API
-     *
-     * @param string $token JWT token for authentication
-     *
      * @throws \Exception
      */
     public function deleteUser(string $token, int $id): bool
@@ -253,10 +223,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
     }
 
     /**
-     * Import users from external API (dane.gov.pl)
-     *
-     * @param string $token JWT token for authentication
-     *
      * @return array<string, mixed>
      *
      * @throws \Exception
@@ -272,9 +238,6 @@ final readonly class PhoenixApiService implements PhoenixApiServiceInterface
         return $result;
     }
 
-    /**
-     * Check if Phoenix API is available
-     */
     public function isApiAvailable(): bool
     {
         try {

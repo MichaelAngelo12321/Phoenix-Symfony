@@ -63,7 +63,6 @@ defmodule PhoenixApi.AccountsTest do
     end
 
     test "create_user with generated data works" do
-      # Test creating user with generated data
       user_data = Accounts.generate_random_user()
       
       assert {:ok, %User{} = user} = Accounts.create_user(user_data)

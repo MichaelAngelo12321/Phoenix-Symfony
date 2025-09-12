@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Dto\AuthenticationResultDto;
+use App\Dto\TokenVerificationResultDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -18,39 +20,30 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
     ) {
     }
 
-    /**
-     * Authenticate admin with Phoenix API
-     */
-    public function login(string $email, string $password): array
+    public function login(string $email, string $password): AuthenticationResultDto
     {
         $payload = ['email' => $email, 'password' => $password];
         $response = $this->makeApiRequest('POST', '/auth/login', $payload);
 
         if (! $response['success']) {
-            return $response;
+            return AuthenticationResultDto::failure($response['error']);
         }
 
         return $this->processLoginResponse($response['data']);
     }
 
-    /**
-     * Verify JWT token with Phoenix API
-     */
-    public function verifyToken(string $token): array
+    public function verifyToken(string $token): TokenVerificationResultDto
     {
         $payload = ['token' => $token];
         $response = $this->makeApiRequest('POST', '/auth/verify', $payload);
 
         if (! $response['success']) {
-            return array_merge($response, ['valid' => false]);
+            return TokenVerificationResultDto::failure($response['error']);
         }
 
         return $this->processVerifyResponse($response['data']);
     }
 
-    /**
-     * Make authenticated request to Phoenix API
-     */
     public function makeAuthenticatedRequest(string $method, string $endpoint, string $token, array $options = []): array
     {
         try {
@@ -68,7 +61,6 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
 
             $statusCode = $response->getStatusCode();
 
-            // Handle responses without content (like DELETE operations)
             if ($statusCode === 204 || $response->getContent(false) === '') {
                 return [
                     'success' => true,
@@ -95,9 +87,6 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
         }
     }
 
-    /**
-     * Make API request with error handling
-     */
     private function makeApiRequest(string $method, string $endpoint, array $payload): array
     {
         try {
@@ -130,42 +119,31 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
         }
     }
 
-    /**
-     * Process login response data
-     */
-    private function processLoginResponse(array $data): array
+    private function processLoginResponse(array $data): AuthenticationResultDto
     {
         if (isset($data['success']) && $data['success']) {
-            return [
-                'success' => true,
-                'token' => $data['token'],
-                'admin' => $data['admin'],
-            ];
+            return AuthenticationResultDto::success(
+                $data['token'],
+                $data['admin']
+            );
         }
 
-        return [
-            'success' => false,
-            'error' => $data['error'] ?? 'Authentication failed',
-        ];
+        return AuthenticationResultDto::failure(
+            $data['error'] ?? 'Authentication failed'
+        );
     }
 
-    /**
-     * Process token verification response data
-     */
-    private function processVerifyResponse(array $data): array
+    private function processVerifyResponse(array $data): TokenVerificationResultDto
     {
         if (isset($data['success']) && $data['success']) {
-            return [
-                'success' => true,
-                'valid' => $data['valid'],
-                'admin' => $data['admin'] ?? null,
-            ];
+            if ($data['valid']) {
+                return TokenVerificationResultDto::valid($data['admin'] ?? []);
+            }
+            return TokenVerificationResultDto::invalid($data['error'] ?? 'Token is invalid');
         }
 
-        return [
-            'success' => false,
-            'valid' => false,
-            'error' => $data['error'] ?? 'Token verification failed',
-        ];
+        return TokenVerificationResultDto::failure(
+            $data['error'] ?? 'Token verification failed'
+        );
     }
 }

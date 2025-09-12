@@ -30,8 +30,8 @@ defmodule PhoenixApi.Accounts.User do
         cond do
           Date.compare(birthdate, today) == :gt ->
             add_error(changeset, :birthdate, "cannot be in the future")
-          Date.diff(today, birthdate) > 36500 -> # ~100 years
-            add_error(changeset, :birthdate, "cannot be more than 100 years ago")
+          Date.diff(today, birthdate) > 36500 ->
+        add_error(changeset, :birthdate, "Birthdate cannot be more than 100 years ago")
           true -> changeset
         end
     end

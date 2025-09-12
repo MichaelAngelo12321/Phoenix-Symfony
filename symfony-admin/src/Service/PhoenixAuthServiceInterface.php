@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Dto\AuthenticationResultDto;
+use App\Dto\TokenVerificationResultDto;
+
 /**
  * Interface for Phoenix Authentication Service
  *
@@ -13,17 +16,13 @@ interface PhoenixAuthServiceInterface
 {
     /**
      * Authenticate admin with Phoenix API
-     *
-     * @return array<string, mixed>
      */
-    public function login(string $email, string $password): array;
+    public function login(string $email, string $password): AuthenticationResultDto;
 
     /**
      * Verify JWT token with Phoenix API
-     *
-     * @return array<string, mixed>
      */
-    public function verifyToken(string $token): array;
+    public function verifyToken(string $token): TokenVerificationResultDto;
 
     /**
      * Make authenticated request to Phoenix API

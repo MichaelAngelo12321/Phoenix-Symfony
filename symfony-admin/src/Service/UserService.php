@@ -7,41 +7,27 @@ namespace App\Service;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * User business logic service
- *
- * Handles user-related business operations
- */
-final class UserService implements UserServiceInterface
+final readonly class UserService implements UserServiceInterface
 {
     public function __construct(
-        private readonly PhoenixApiServiceInterface $phoenixApiService,
-        private readonly LoggerInterface $logger,
+        private PhoenixApiServiceInterface $phoenixApiService,
+        private LoggerInterface $logger,
     ) {
     }
 
     /**
-     * Get users with filtering and sorting
-     *
-     * @param string $token JWT token for API authentication
-     * @param Request $request HTTP request with filter parameters
-     *
      * @return array{users: array, api_available: bool, current_filters: array, sort_by: string, sort_order: string, errors: array}
      */
     public function getUsers(string $token, Request $request): array
     {
         try {
-            // Extract filters
             $filters = $this->extractFilters($request);
 
-            // Get sorting parameters
             $sortBy = $request->query->get('sort_by', 'id');
             $sortOrder = $request->query->get('sort_order', 'asc');
 
-            // Remove empty filters
             $filters = array_filter($filters, static fn ($value) => $value !== null && $value !== '');
 
-            // Add sorting to filters
             if ($sortBy) {
                 $filters['sort_by'] = $sortBy;
                 $filters['sort_order'] = $sortOrder;
@@ -75,11 +61,6 @@ final class UserService implements UserServiceInterface
     }
 
     /**
-     * Get single user by ID
-     *
-     * @param string $token JWT token for API authentication
-     * @param int $id User ID
-     *
      * @return array{user: array|null, api_available: bool, errors: array}
      */
     public function getUser(string $token, int $id): array
@@ -108,21 +89,14 @@ final class UserService implements UserServiceInterface
     }
 
     /**
-     * Create new user
-     *
-     * @param string $token JWT token for API authentication
-     * @param array<string, mixed> $userData User data to create
-     *
      * @return array{success: bool, user: array|null, errors: array}
      */
     public function createUser(string $token, array $userData): array
     {
-        // Convert DateTime to string for API compatibility
         if (isset($userData['birthdate']) && $userData['birthdate'] instanceof \DateTime) {
             $userData['birthdate'] = $userData['birthdate']->format('Y-m-d');
         }
 
-        // Convert first_name and last_name to uppercase
         if (isset($userData['first_name'])) {
             $userData['first_name'] = strtoupper($userData['first_name']);
         }
@@ -133,7 +107,6 @@ final class UserService implements UserServiceInterface
         try {
             $apiResponse = $this->phoenixApiService->createUser($token, $userData);
 
-            // PhoenixApiService returns data directly from API on success
             return [
                 'success' => true,
                 'user' => $apiResponse['data'] ?? null,
@@ -154,17 +127,10 @@ final class UserService implements UserServiceInterface
     }
 
     /**
-     * Update existing user
-     *
-     * @param string $token JWT token for API authentication
-     * @param int $id User ID
-     * @param array<string, mixed> $userData User data to update
-     *
      * @return array{success: bool, user: array|null, errors: array}
      */
     public function updateUser(string $token, int $id, array $userData): array
     {
-        // Convert DateTime to string for API
         if (isset($userData['birthdate']) && $userData['birthdate'] instanceof \DateTime) {
             $userData['birthdate'] = $userData['birthdate']->format('Y-m-d');
         }
@@ -200,11 +166,6 @@ final class UserService implements UserServiceInterface
     }
 
     /**
-     * Delete user
-     *
-     * @param string $token JWT token for API authentication
-     * @param int $id User ID
-     *
      * @return array{success: bool, errors: array}
      */
     public function deleteUser(string $token, int $id): array
@@ -252,30 +213,7 @@ final class UserService implements UserServiceInterface
         }
     }
 
-    public function checkApiStatus(): array
-    {
-        try {
-            $isAvailable = $this->phoenixApiService->isApiAvailable();
-
-            return [
-                'available' => $isAvailable,
-                'errors' => [],
-            ];
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to check API status', [
-                'error' => $e->getMessage(),
-            ]);
-
-            return [
-                'available' => false,
-                'errors' => ['Nie można sprawdzić statusu API: ' . $e->getMessage()],
-            ];
-        }
-    }
-
     /**
-     * Extract filter parameters from request
-     *
      * @return array<string, mixed>
      */
     private function extractFilters(Request $request): array

@@ -143,17 +143,7 @@
                             <table class="table table-bordered table-hover">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>
-                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'id', sort_order: (sort_by == 'id' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
-                                               class="text-decoration-none text-dark d-flex align-items-center">
-                                                Lp.
-                                                {% if sort_by == 'id' %}
-                                                    <i class="fas fa-sort-{{ sort_order == 'asc' ? 'up' : 'down' }} ms-1"></i>
-                                                {% else %}
-                                                    <i class="fas fa-sort ms-1 text-muted"></i>
-                                                {% endif %}
-                                            </a>
-                                        </th>
+                                        <th>Lp.</th>
                                         <th>
                                             <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'first_name', sort_order: (sort_by == 'first_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
                                                class="text-decoration-none text-dark d-flex align-items-center">
@@ -290,7 +280,7 @@ function confirmDelete(userId, userName) {
 
 // Auto-refresh API status
 setInterval(function() {
-    fetch('{{ path('admin_users_api_status') }}')
+    fetch('{{ path('admin_system_api_status') }}')
         .then(response => response.json())
         .then(data => {
             const badge = document.querySelector('.badge');

@@ -96,6 +96,7 @@
                             Użytkownicy
                         </a>
                     </li>
+
                 </ul>
                 
                 <div class="mt-auto p-4">
@@ -128,10 +129,7 @@
                                     {% endif %}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Profil</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Ustawienia</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-    
+                                    <li><a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i> Wyloguj</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -152,33 +150,6 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
         
-        <script>
-        // API Status Check
-        function checkApiStatus() {
-            fetch('/admin/users/api-status')
-                .then(response => response.json())
-                .then(data => {
-                    const statusElement = document.getElementById('api-status');
-                    if (data.status === 'connected') {
-                        statusElement.className = 'badge bg-success';
-                        statusElement.innerHTML = '<i class="fas fa-circle"></i> API Connected';
-                    } else {
-                        statusElement.className = 'badge bg-danger';
-                        statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> API Disconnected';
-                    }
-                })
-                .catch(() => {
-                    const statusElement = document.getElementById('api-status');
-                    statusElement.className = 'badge bg-warning';
-                    statusElement.innerHTML = '<i class="fas fa-question-circle"></i> API Unknown';
-                });
-        }
-        
-        // Check API status on page load and every 30 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            checkApiStatus();
-            setInterval(checkApiStatus, 30000);
-        });
-        </script>
+
     </body>
 </html>

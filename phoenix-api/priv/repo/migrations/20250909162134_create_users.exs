@@ -2,7 +2,6 @@ defmodule PhoenixApi.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
   def change do
-    # Tworzenie typu enum dla gender
     execute "CREATE TYPE gender_enum AS ENUM ('male', 'female')", "DROP TYPE gender_enum"
     
     create table(:users) do
