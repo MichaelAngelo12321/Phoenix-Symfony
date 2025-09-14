@@ -56,39 +56,14 @@ final readonly class UserListResponseDto
         return $this->success;
     }
 
-    public function getUserCount(): int
-    {
-        return count($this->users);
-    }
-
     public function getErrors(): array
     {
         return $this->errors;
     }
 
-    public function getUsers(): array
-    {
-        return $this->users;
-    }
-
     public function isApiAvailable(): bool
     {
         return $this->apiAvailable;
-    }
-
-    public function getCurrentFilters(): array
-    {
-        return $this->currentFilters;
-    }
-
-    public function getSortBy(): string
-    {
-        return $this->sortBy;
-    }
-
-    public function getSortOrder(): string
-    {
-        return $this->sortOrder;
     }
 
     public function toArray(): array

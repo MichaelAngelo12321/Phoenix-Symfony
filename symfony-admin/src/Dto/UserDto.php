@@ -52,41 +52,4 @@ final readonly class UserDto
             'gender' => $this->gender?->value,
         ], static fn ($value) => $value !== null);
     }
-
-    public function getFullName(): string
-    {
-        return trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
-    }
-
-    public function getAge(): ?int
-    {
-        if ($this->birthdate === null) {
-            return null;
-        }
-
-        return (new \DateTime())->diff($this->birthdate)->y;
-    }
-
-    public function isComplete(): bool
-    {
-        return $this->firstName !== null
-            && $this->lastName !== null
-            && $this->birthdate !== null
-            && $this->gender !== null;
-    }
-
-    public function withUpdatedData(
-        ?string $firstName = null,
-        ?string $lastName = null,
-        ?\DateTimeInterface $birthdate = null,
-        ?GenderEnum $gender = null
-    ): self {
-        return new self(
-            id: $this->id,
-            firstName: $firstName ?? $this->firstName,
-            lastName: $lastName ?? $this->lastName,
-            birthdate: $birthdate ?? $this->birthdate,
-            gender: $gender ?? $this->gender
-        );
-    }
 }

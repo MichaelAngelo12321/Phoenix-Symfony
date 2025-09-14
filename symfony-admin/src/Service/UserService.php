@@ -8,6 +8,7 @@ use App\Dto\FilterDto;
 use App\Dto\UserListResponseDto;
 use App\Dto\UserRequestDto;
 use App\Dto\UserResponseDto;
+use App\Mapper\UserMapper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,7 +16,6 @@ final readonly class UserService implements UserServiceInterface
 {
     public function __construct(
         private PhoenixApiServiceInterface $phoenixApiService,
-        private UserMapperServiceInterface $userMapperService,
         private LoggerInterface $logger,
     ) {
     }
@@ -29,9 +29,9 @@ final readonly class UserService implements UserServiceInterface
             $apiResponse = $this->phoenixApiService->getUsers($token, $filters);
             $usersData = $apiResponse['data'] ?? [];
 
-            $users = $this->userMapperService->mapApiResponseArrayToUserDtos($usersData);
+            $users = UserMapper::mapApiResponseArrayToUserDtos($usersData);
 
-            return $this->userMapperService->createUserListSuccessResponse(
+            return UserMapper::createUserListSuccessResponse(
                 $users,
                 $filterDto->getCurrentFilters(),
                 $filterDto->sortBy,
@@ -42,8 +42,8 @@ final readonly class UserService implements UserServiceInterface
                 'error' => $e->getMessage(),
             ]);
 
-            $errors = $this->userMapperService->mapApiErrorToErrors($e);
-            return $this->userMapperService->createUserListFailureResponse($errors, false);
+            $errors = UserMapper::mapApiErrorToErrors($e);
+            return UserMapper::createUserListFailureResponse($errors, false);
         }
     }
 
@@ -54,30 +54,30 @@ final readonly class UserService implements UserServiceInterface
             $userData = $apiResponse['data'] ?? null;
 
             if ($userData === null) {
-                return $this->userMapperService->createFailureResponse(
+                return UserMapper::createFailureResponse(
                     ['Użytkownik nie został znaleziony'],
                     true
                 );
             }
 
-            $user = $this->userMapperService->mapApiResponseToUserDto($userData);
+            $user = UserMapper::mapApiResponseToUserDto($userData);
 
             if ($user === null) {
-                return $this->userMapperService->createFailureResponse(
+                return UserMapper::createFailureResponse(
                     ['Błąd mapowania danych użytkownika'],
                     true
                 );
             }
 
-            return $this->userMapperService->createSuccessResponse($user);
+            return UserMapper::createSuccessResponse($user);
         } catch (\Exception $e) {
             $this->logger->error('Failed to fetch user from Phoenix API', [
                 'user_id' => $id,
                 'error' => $e->getMessage(),
             ]);
 
-            $errors = $this->userMapperService->mapApiErrorToErrors($e);
-            return $this->userMapperService->createFailureResponse($errors, false);
+            $errors = UserMapper::mapApiErrorToErrors($e);
+            return UserMapper::createFailureResponse($errors, false);
         }
     }
 
@@ -86,31 +86,31 @@ final readonly class UserService implements UserServiceInterface
         try {
             $validationErrors = $this->validateUserRequest($userRequest);
             if (! empty($validationErrors)) {
-                return $this->userMapperService->createFailureResponse($validationErrors, true);
+                return UserMapper::createFailureResponse($validationErrors, true);
             }
 
-            $apiData = $this->userMapperService->mapUserRequestDtoToApiRequest($userRequest);
+            $apiData = UserMapper::mapUserRequestDtoToApiRequest($userRequest);
 
             $apiResponse = $this->phoenixApiService->createUser($token, $apiData);
             $userData = $apiResponse['data'] ?? null;
 
             if ($userData === null) {
-                return $this->userMapperService->createFailureResponse(
+                return UserMapper::createFailureResponse(
                     ['Błąd podczas tworzenia użytkownika'],
                     true
                 );
             }
 
-            $user = $this->userMapperService->mapApiResponseToUserDto($userData);
+            $user = UserMapper::mapApiResponseToUserDto($userData);
 
             if ($user === null) {
-                return $this->userMapperService->createFailureResponse(
+                return UserMapper::createFailureResponse(
                     ['Błąd mapowania utworzonego użytkownika'],
                     true
                 );
             }
 
-            return $this->userMapperService->createSuccessResponse(
+            return UserMapper::createSuccessResponse(
                 $user,
                 'Użytkownik został pomyślnie utworzony'
             );
@@ -120,8 +120,8 @@ final readonly class UserService implements UserServiceInterface
                 'error' => $e->getMessage(),
             ]);
 
-            $errors = $this->userMapperService->mapApiErrorToErrors($e);
-            return $this->userMapperService->createFailureResponse($errors, false);
+            $errors = UserMapper::mapApiErrorToErrors($e);
+            return UserMapper::createFailureResponse($errors, false);
         }
     }
 
@@ -130,31 +130,31 @@ final readonly class UserService implements UserServiceInterface
         try {
             $validationErrors = $this->validateUserRequest($userRequest);
             if (! empty($validationErrors)) {
-                return $this->userMapperService->createFailureResponse($validationErrors, true);
+                return UserMapper::createFailureResponse($validationErrors, true);
             }
 
-            $apiData = $this->userMapperService->mapUserRequestDtoToApiRequest($userRequest);
+            $apiData = UserMapper::mapUserRequestDtoToApiRequest($userRequest);
 
             $apiResponse = $this->phoenixApiService->updateUser($token, $id, $apiData);
             $userData = $apiResponse['data'] ?? null;
 
             if ($userData === null) {
-                return $this->userMapperService->createFailureResponse(
+                return UserMapper::createFailureResponse(
                     ['Błąd podczas aktualizacji użytkownika'],
                     true
                 );
             }
 
-            $user = $this->userMapperService->mapApiResponseToUserDto($userData);
+            $user = UserMapper::mapApiResponseToUserDto($userData);
 
             if ($user === null) {
-                return $this->userMapperService->createFailureResponse(
+                return UserMapper::createFailureResponse(
                     ['Błąd mapowania zaktualizowanego użytkownika'],
                     true
                 );
             }
 
-            return $this->userMapperService->createSuccessResponse(
+            return UserMapper::createSuccessResponse(
                 $user,
                 'Użytkownik został pomyślnie zaktualizowany'
             );
@@ -165,8 +165,8 @@ final readonly class UserService implements UserServiceInterface
                 'error' => $e->getMessage(),
             ]);
 
-            $errors = $this->userMapperService->mapApiErrorToErrors($e);
-            return $this->userMapperService->createFailureResponse($errors, false);
+            $errors = UserMapper::mapApiErrorToErrors($e);
+            return UserMapper::createFailureResponse($errors, false);
         }
     }
 
@@ -182,8 +182,8 @@ final readonly class UserService implements UserServiceInterface
                 'error' => $e->getMessage(),
             ]);
 
-            $errors = $this->userMapperService->mapApiErrorToErrors($e);
-            return $this->userMapperService->createFailureResponse($errors, false);
+            $errors = UserMapper::mapApiErrorToErrors($e);
+            return UserMapper::createFailureResponse($errors, false);
         }
     }
 
@@ -193,9 +193,9 @@ final readonly class UserService implements UserServiceInterface
             $result = $this->phoenixApiService->importUsers($token);
             $usersData = $result['data'] ?? [];
 
-            $users = $this->userMapperService->mapApiResponseArrayToUserDtos($usersData);
+            $users = UserMapper::mapApiResponseArrayToUserDtos($usersData);
 
-            return $this->userMapperService->createUserListSuccessResponse(
+            return UserMapper::createUserListSuccessResponse(
                 users: $users,
                 currentFilters: [],
                 sortBy: 'id',
@@ -206,8 +206,8 @@ final readonly class UserService implements UserServiceInterface
                 'error' => $e->getMessage(),
             ]);
 
-            $errors = $this->userMapperService->mapApiErrorToErrors($e);
-            return $this->userMapperService->createUserListFailureResponse($errors, false);
+            $errors = UserMapper::mapApiErrorToErrors($e);
+            return UserMapper::createUserListFailureResponse($errors, false);
         }
     }
 

@@ -26,17 +26,6 @@ final readonly class UserRequestDto
         );
     }
 
-    public function toUserDto(?int $id = null): UserDto
-    {
-        return new UserDto(
-            id: $id,
-            firstName: $this->firstName,
-            lastName: $this->lastName,
-            birthdate: $this->birthdate,
-            gender: $this->gender
-        );
-    }
-
     public function toArray(): array
     {
         return array_filter([

@@ -37,11 +37,11 @@ final class UserController extends AbstractController
         }
 
         return $this->render('admin/users/index.html.twig', [
-            'users' => $result->getUsers(),
+            'users' => $result->users,
             'api_available' => $result->isApiAvailable(),
-            'current_filters' => $result->getCurrentFilters(),
-            'sort_by' => $result->getSortBy(),
-            'sort_order' => $result->getSortOrder(),
+            'current_filters' => $result->currentFilters,
+            'sort_by' => $result->sortBy,
+            'sort_order' => $result->sortOrder,
         ]);
     }
 
@@ -181,8 +181,8 @@ final class UserController extends AbstractController
 
         if ($result->isSuccess()) {
             $this->addFlash('success', sprintf(
-                'Import zakończony pomyślnie! Zaimportowano %d użytkowników.',
-                count($result->getUsers())
+                'Import zakończony pomyślnie! Zaimportowano 100 użytkowników.',
+                count($result->users)
             ));
         }
 

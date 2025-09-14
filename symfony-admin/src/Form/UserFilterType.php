@@ -125,6 +125,6 @@ final class UserFilterType extends AbstractType
 
     public function getBlockPrefix(): string
     {
-        return ''; 
+        return '';
     }
 }
