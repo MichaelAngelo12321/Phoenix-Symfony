@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Dto\FilterDto;
+use App\Dto\UserListResponseDto;
+use App\Dto\UserRequestDto;
+use App\Dto\UserResponseDto;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -11,219 +15,218 @@ final readonly class UserService implements UserServiceInterface
 {
     public function __construct(
         private PhoenixApiServiceInterface $phoenixApiService,
+        private UserMapperServiceInterface $userMapperService,
         private LoggerInterface $logger,
     ) {
     }
 
-    /**
-     * @return array{users: array, api_available: bool, current_filters: array, sort_by: string, sort_order: string, errors: array}
-     */
-    public function getUsers(string $token, Request $request): array
+    public function getUsers(string $token, Request $request): UserListResponseDto
     {
         try {
-            $filters = $this->extractFilters($request);
-
-            $sortBy = $request->query->get('sort_by', 'id');
-            $sortOrder = $request->query->get('sort_order', 'asc');
-
-            $filters = array_filter($filters, static fn ($value) => $value !== null && $value !== '');
-
-            if ($sortBy) {
-                $filters['sort_by'] = $sortBy;
-                $filters['sort_order'] = $sortOrder;
-            }
+            $filterDto = FilterDto::fromRequest($request);
+            $filters = $filterDto->toArray();
 
             $apiResponse = $this->phoenixApiService->getUsers($token, $filters);
-            $users = $apiResponse['data'] ?? [];
+            $usersData = $apiResponse['data'] ?? [];
 
-            return [
-                'users' => $users,
-                'api_available' => true,
-                'current_filters' => $request->query->all(),
-                'sort_by' => $sortBy,
-                'sort_order' => $sortOrder,
-                'errors' => [],
-            ];
+            $users = $this->userMapperService->mapApiResponseArrayToUserDtos($usersData);
+
+            return $this->userMapperService->createUserListSuccessResponse(
+                $users,
+                $filterDto->getCurrentFilters(),
+                $filterDto->sortBy,
+                $filterDto->sortOrder
+            );
         } catch (\Exception $e) {
             $this->logger->error('Failed to fetch users for admin panel', [
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'users' => [],
-                'api_available' => false,
-                'current_filters' => [],
-                'sort_by' => 'id',
-                'sort_order' => 'asc',
-                'errors' => ['Nie można pobrać listy użytkowników: ' . $e->getMessage()],
-            ];
+            $errors = $this->userMapperService->mapApiErrorToErrors($e);
+            return $this->userMapperService->createUserListFailureResponse($errors, false);
         }
     }
 
-    /**
-     * @return array{user: array|null, api_available: bool, errors: array}
-     */
-    public function getUser(string $token, int $id): array
+    public function getUser(string $token, int $id): UserResponseDto
     {
         try {
             $apiResponse = $this->phoenixApiService->getUser($token, $id);
-            $user = $apiResponse['data'] ?? null;
+            $userData = $apiResponse['data'] ?? null;
 
-            return [
-                'user' => $user,
-                'api_available' => true,
-                'errors' => [],
-            ];
+            if ($userData === null) {
+                return $this->userMapperService->createFailureResponse(
+                    ['Użytkownik nie został znaleziony'],
+                    true
+                );
+            }
+
+            $user = $this->userMapperService->mapApiResponseToUserDto($userData);
+
+            if ($user === null) {
+                return $this->userMapperService->createFailureResponse(
+                    ['Błąd mapowania danych użytkownika'],
+                    true
+                );
+            }
+
+            return $this->userMapperService->createSuccessResponse($user);
         } catch (\Exception $e) {
             $this->logger->error('Failed to fetch user from Phoenix API', [
                 'user_id' => $id,
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'user' => null,
-                'api_available' => false,
-                'errors' => ['Nie można pobrać danych użytkownika: ' . $e->getMessage()],
-            ];
+            $errors = $this->userMapperService->mapApiErrorToErrors($e);
+            return $this->userMapperService->createFailureResponse($errors, false);
         }
     }
 
-    /**
-     * @return array{success: bool, user: array|null, errors: array}
-     */
-    public function createUser(string $token, array $userData): array
+    public function createUser(string $token, UserRequestDto $userRequest): UserResponseDto
     {
-        if (isset($userData['birthdate']) && $userData['birthdate'] instanceof \DateTime) {
-            $userData['birthdate'] = $userData['birthdate']->format('Y-m-d');
-        }
-
-        if (isset($userData['first_name'])) {
-            $userData['first_name'] = strtoupper($userData['first_name']);
-        }
-        if (isset($userData['last_name'])) {
-            $userData['last_name'] = strtoupper($userData['last_name']);
-        }
-
         try {
-            $apiResponse = $this->phoenixApiService->createUser($token, $userData);
+            $validationErrors = $this->validateUserRequest($userRequest);
+            if (! empty($validationErrors)) {
+                return $this->userMapperService->createFailureResponse($validationErrors, true);
+            }
 
-            return [
-                'success' => true,
-                'user' => $apiResponse['data'] ?? null,
-                'errors' => [],
-            ];
+            $apiData = $this->userMapperService->mapUserRequestDtoToApiRequest($userRequest);
+
+            $apiResponse = $this->phoenixApiService->createUser($token, $apiData);
+            $userData = $apiResponse['data'] ?? null;
+
+            if ($userData === null) {
+                return $this->userMapperService->createFailureResponse(
+                    ['Błąd podczas tworzenia użytkownika'],
+                    true
+                );
+            }
+
+            $user = $this->userMapperService->mapApiResponseToUserDto($userData);
+
+            if ($user === null) {
+                return $this->userMapperService->createFailureResponse(
+                    ['Błąd mapowania utworzonego użytkownika'],
+                    true
+                );
+            }
+
+            return $this->userMapperService->createSuccessResponse(
+                $user,
+                'Użytkownik został pomyślnie utworzony'
+            );
         } catch (\Exception $e) {
             $this->logger->error('Failed to create user via Phoenix API', [
-                'user_data' => $userData,
+                'user_data' => $userRequest->toArray(),
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'success' => false,
-                'user' => null,
-                'errors' => ['Nie można utworzyć użytkownika: ' . $e->getMessage()],
-            ];
+            $errors = $this->userMapperService->mapApiErrorToErrors($e);
+            return $this->userMapperService->createFailureResponse($errors, false);
         }
     }
 
-    /**
-     * @return array{success: bool, user: array|null, errors: array}
-     */
-    public function updateUser(string $token, int $id, array $userData): array
+    public function updateUser(string $token, int $id, UserRequestDto $userRequest): UserResponseDto
     {
-        if (isset($userData['birthdate']) && $userData['birthdate'] instanceof \DateTime) {
-            $userData['birthdate'] = $userData['birthdate']->format('Y-m-d');
-        }
-
-        if (isset($userData['first_name'])) {
-            $userData['first_name'] = strtoupper($userData['first_name']);
-        }
-        if (isset($userData['last_name'])) {
-            $userData['last_name'] = strtoupper($userData['last_name']);
-        }
-
         try {
-            $this->phoenixApiService->updateUser($token, $id, $userData);
+            $validationErrors = $this->validateUserRequest($userRequest);
+            if (! empty($validationErrors)) {
+                return $this->userMapperService->createFailureResponse($validationErrors, true);
+            }
 
-            return [
-                'success' => true,
-                'user' => $apiResponse['data'] ?? null,
-                'errors' => [],
-            ];
+            $apiData = $this->userMapperService->mapUserRequestDtoToApiRequest($userRequest);
+
+            $apiResponse = $this->phoenixApiService->updateUser($token, $id, $apiData);
+            $userData = $apiResponse['data'] ?? null;
+
+            if ($userData === null) {
+                return $this->userMapperService->createFailureResponse(
+                    ['Błąd podczas aktualizacji użytkownika'],
+                    true
+                );
+            }
+
+            $user = $this->userMapperService->mapApiResponseToUserDto($userData);
+
+            if ($user === null) {
+                return $this->userMapperService->createFailureResponse(
+                    ['Błąd mapowania zaktualizowanego użytkownika'],
+                    true
+                );
+            }
+
+            return $this->userMapperService->createSuccessResponse(
+                $user,
+                'Użytkownik został pomyślnie zaktualizowany'
+            );
         } catch (\Exception $e) {
             $this->logger->error('Failed to update user via Phoenix API', [
                 'user_id' => $id,
-                'user_data' => $userData,
+                'user_data' => $userRequest->toArray(),
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'success' => false,
-                'user' => null,
-                'errors' => ['Nie można zaktualizować użytkownika: ' . $e->getMessage()],
-            ];
+            $errors = $this->userMapperService->mapApiErrorToErrors($e);
+            return $this->userMapperService->createFailureResponse($errors, false);
         }
     }
 
-    /**
-     * @return array{success: bool, errors: array}
-     */
-    public function deleteUser(string $token, int $id): array
+    public function deleteUser(string $token, int $id): UserResponseDto
     {
         try {
             $this->phoenixApiService->deleteUser($token, $id);
 
-            return [
-                'success' => true,
-                'errors' => [],
-            ];
+            return UserResponseDto::successWithoutData('Użytkownik został pomyślnie usunięty');
         } catch (\Exception $e) {
             $this->logger->error('Failed to delete user via Phoenix API', [
                 'user_id' => $id,
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'success' => false,
-                'errors' => ['Nie można usunąć użytkownika: ' . $e->getMessage()],
-            ];
+            $errors = $this->userMapperService->mapApiErrorToErrors($e);
+            return $this->userMapperService->createFailureResponse($errors, false);
         }
     }
 
-    public function importUsers(string $token): array
+    public function importUsers(string $token): UserListResponseDto
     {
         try {
             $result = $this->phoenixApiService->importUsers($token);
+            $usersData = $result['data'] ?? [];
 
-            return [
-                'success' => true,
-                'count' => $result['count'] ?? 0,
-                'errors' => [],
-            ];
+            $users = $this->userMapperService->mapApiResponseArrayToUserDtos($usersData);
+
+            return $this->userMapperService->createUserListSuccessResponse(
+                users: $users,
+                currentFilters: [],
+                sortBy: 'id',
+                sortOrder: 'asc'
+            );
         } catch (\Exception $e) {
             $this->logger->error('Failed to import users', [
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'success' => false,
-                'count' => 0,
-                'errors' => ['Nie można zaimportować użytkowników: ' . $e->getMessage()],
-            ];
+            $errors = $this->userMapperService->mapApiErrorToErrors($e);
+            return $this->userMapperService->createUserListFailureResponse($errors, false);
         }
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string> Array of validation errors
      */
-    private function extractFilters(Request $request): array
+    private function validateUserRequest(UserRequestDto $userRequest): array
     {
-        return [
-            'first_name' => $request->query->get('first_name'),
-            'last_name' => $request->query->get('last_name'),
-            'gender' => $request->query->get('gender'),
-            'birthdate_from' => $request->query->get('birthdate_from'),
-            'birthdate_to' => $request->query->get('birthdate_to'),
-        ];
+        $errors = [];
+
+        if (! $userRequest->isValid()) {
+            $errors[] = 'Wszystkie wymagane pola muszą być wypełnione';
+        }
+
+        $validationErrors = $userRequest->getValidationErrors();
+        if (! empty($validationErrors)) {
+            $errors = array_merge($errors, array_values($validationErrors));
+        }
+
+        return $errors;
     }
 }

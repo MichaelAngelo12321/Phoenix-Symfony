@@ -22,7 +22,7 @@ final class AuthenticationListener
     public function __construct(
         private readonly PhoenixAuthServiceInterface $phoenixAuthService,
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
     ) {
     }
 

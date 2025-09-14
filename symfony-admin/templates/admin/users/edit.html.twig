@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edytuj użytkownika - {{ user.first_name }} {{ user.last_name }}{% endblock %}
+{% block title %}Edytuj użytkownika - {{ user.firstName }} {{ user.lastName }}{% endblock %}
 
 {% block body %}
 <div class="container-fluid py-4">
@@ -11,7 +11,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ path('admin_users_index') }}">Użytkownicy</a></li>
-                            <li class="breadcrumb-item"><a href="{{ path('admin_users_show', {id: user.id}) }}">{{ user.first_name }} {{ user.last_name }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('admin_users_show', {id: user.id}) }}">{{ user.firstName }} {{ user.lastName }}</a></li>
                             <li class="breadcrumb-item active">Edycja</li>
                         </ol>
                     </nav>
@@ -26,20 +26,6 @@
                     </a>
                 </div>
             </div>
-
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
 
             <div class="row justify-content-center">
                 <div class="col-lg-8">
@@ -58,7 +44,7 @@
                                             {{ form_widget(form.first_name, {'attr': {'class': 'form-control', 'id': 'first_name'}}) }}
                                             {{ form_errors(form.first_name) }}
                                             <div class="form-text">
-                                                Aktualne imię: {{ user.first_name }}
+                                                Aktualne imię: {{ user.firstName }}
                                             </div>
                                         </div>
                                     </div>
@@ -68,7 +54,7 @@
                                             {{ form_widget(form.last_name, {'attr': {'class': 'form-control', 'id': 'last_name'}}) }}
                                             {{ form_errors(form.last_name) }}
                                             <div class="form-text">
-                                                Aktualne nazwisko: {{ user.last_name }}
+                                                Aktualne nazwisko: {{ user.lastName }}
                                             </div>
                                         </div>
                                     </div>
@@ -96,10 +82,14 @@
                                             {{ form_errors(form.gender) }}
                                             <div class="form-text">
                                                 Aktualna płeć: 
-                                                {% if user.gender == 'male' %}
-                                                    <span class="badge bg-info">Mężczyzna</span>
+                                                {% if user.gender %}
+                                                    {% if user.gender.value == 'male' %}
+                                                        <span class="badge bg-info">{{ user.gender.getLabel() }}</span>
+                                                    {% else %}
+                                                        <span class="badge bg-pink">{{ user.gender.getLabel() }}</span>
+                                                    {% endif %}
                                                 {% else %}
-                                                    <span class="badge bg-pink">Kobieta</span>
+                                                    <span class="badge bg-secondary">Nie określono</span>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -126,7 +116,7 @@
                                                 </a>
                                                 <button type="button" 
                                                         class="btn btn-outline-danger" 
-                                                        onclick="confirmDelete({{ user.id }}, '{{ user.first_name }} {{ user.last_name }}')">
+                                                        onclick="confirmDelete({{ user.id }}, '{{ user.firstName }} {{ user.lastName }}')">
                                                     <i class="fas fa-trash"></i> Usuń użytkownika
                                                 </button>
                                             </div>
@@ -158,14 +148,18 @@
                                 <h6 class="text-primary">Aktualne dane:</h6>
                                 <ul class="list-unstyled small">
                                     <li><strong>ID:</strong> #{{ user.id }}</li>
-                                    <li><strong>Imię:</strong> {{ user.first_name }}</li>
-                                    <li><strong>Nazwisko:</strong> {{ user.last_name }}</li>
+                                    <li><strong>Imię:</strong> {{ user.firstName }}</li>
+                                    <li><strong>Nazwisko:</strong> {{ user.lastName }}</li>
                                     <li><strong>Data urodzenia:</strong> {{ user.birthdate|date('d.m.Y') }}</li>
                                     <li><strong>Płeć:</strong> 
-                                        {% if user.gender == 'male' %}
-                                            <span class="badge bg-info">Mężczyzna</span>
+                                        {% if user.gender %}
+                                            {% if user.gender.value == 'male' %}
+                                                <span class="badge bg-info">{{ user.gender.getLabel() }}</span>
+                                            {% else %}
+                                                <span class="badge bg-pink">{{ user.gender.getLabel() }}</span>
+                                            {% endif %}
                                         {% else %}
-                                            <span class="badge bg-pink">Kobieta</span>
+                                            <span class="badge bg-secondary">Nie określono</span>
                                         {% endif %}
                                     </li>
                                 </ul>
@@ -241,10 +235,10 @@
 <script>
 // Store original values
 const originalValues = {
-    first_name: '{{ user.first_name }}',
-    last_name: '{{ user.last_name }}',
-    birthdate: '{{ user.birthdate }}',
-    gender: '{{ user.gender }}'
+    first_name: '{{ user.firstName }}',
+                last_name: '{{ user.lastName }}',
+    birthdate: '{{ user.birthdate|date('Y-m-d') }}',
+    gender: '{{ user.gender ? user.gender.value : '' }}'
 };
 
 function resetToOriginal() {

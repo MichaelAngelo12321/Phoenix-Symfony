@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Szczegóły użytkownika - {{ user.first_name }} {{ user.last_name }}{% endblock %}
+{% block title %}Szczegóły użytkownika - {{ user.firstName }} {{ user.lastName }}{% endblock %}
 
 {% block body %}
 <div class="container-fluid py-4">
@@ -11,7 +11,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ path('admin_users_index') }}">Użytkownicy</a></li>
-                            <li class="breadcrumb-item active">{{ user.first_name }} {{ user.last_name }}</li>
+                            <li class="breadcrumb-item active">{{ user.firstName }} {{ user.lastName }}</li>
                         </ol>
                     </nav>
                     <h1 class="h3 mb-0 text-gray-800">Szczegóły użytkownika</h1>
@@ -22,7 +22,7 @@
                     </a>
                     <button type="button" 
                             class="btn btn-danger me-2" 
-                            onclick="confirmDelete({{ user.id }}, '{{ user.first_name }} {{ user.last_name }}')">
+                            onclick="confirmDelete({{ user.id }}, '{{ user.firstName }} {{ user.lastName }}')">
                         <i class="fas fa-trash"></i> Usuń
                     </button>
                     <a href="{{ path('admin_users_index') }}" class="btn btn-secondary">
@@ -31,19 +31,7 @@
                 </div>
             </div>
 
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
 
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
 
             <div class="row">
                 <div class="col-lg-8">
@@ -65,13 +53,19 @@
                                     <div class="mb-3">
                                         <label class="form-label text-muted">Płeć</label>
                                         <div>
-                                            {% if user.gender == 'male' %}
-                                                <span class="badge bg-info fs-6">
-                                                    <i class="fas fa-mars"></i> Mężczyzna
-                                                </span>
+                                            {% if user.gender %}
+                                                {% if user.gender.value == 'male' %}
+                                                    <span class="badge bg-info fs-6">
+                                                        <i class="fas fa-mars"></i> {{ user.gender.getLabel() }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-pink fs-6">
+                                                        <i class="fas fa-venus"></i> {{ user.gender.getLabel() }}
+                                                    </span>
+                                                {% endif %}
                                             {% else %}
-                                                <span class="badge bg-pink fs-6">
-                                                    <i class="fas fa-venus"></i> Kobieta
+                                                <span class="badge bg-secondary fs-6">
+                                                    <i class="fas fa-question"></i> Nie określono
                                                 </span>
                                             {% endif %}
                                         </div>
@@ -83,13 +77,13 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label text-muted">Imię</label>
-                                        <div class="fw-bold fs-5">{{ user.first_name }}</div>
+                                        <div class="fw-bold fs-5">{{ user.firstName }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label text-muted">Nazwisko</label>
-                                        <div class="fw-bold fs-5">{{ user.last_name }}</div>
+                                        <div class="fw-bold fs-5">{{ user.lastName }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +121,7 @@
                                 </a>
                                 <button type="button" 
                                         class="btn btn-danger" 
-                                        onclick="confirmDelete({{ user.id }}, '{{ user.first_name }} {{ user.last_name }}')">
+                                        onclick="confirmDelete({{ user.id }}, '{{ user.firstName }} {{ user.lastName }}')">
                                     <i class="fas fa-trash"></i> Usuń użytkownika
                                 </button>
                                 <hr>

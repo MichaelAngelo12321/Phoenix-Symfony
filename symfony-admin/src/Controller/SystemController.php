@@ -15,7 +15,7 @@ final class SystemController extends AbstractController
 {
     public function __construct(
         private readonly PhoenixApiServiceInterface $phoenixApiService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 

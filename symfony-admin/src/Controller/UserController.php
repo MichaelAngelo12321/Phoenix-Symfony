@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\UserRequestDto;
 use App\Form\UserFormType;
 use App\Service\AuthenticationServiceInterface;
 use App\Service\UserServiceInterface;
@@ -31,16 +32,16 @@ final class UserController extends AbstractController
 
         $result = $this->userService->getUsers($token, $request);
 
-        foreach ($result['errors'] as $error) {
+        foreach ($result->getErrors() as $error) {
             $this->addFlash('error', $error);
         }
 
         return $this->render('admin/users/index.html.twig', [
-            'users' => $result['users'],
-            'api_available' => $result['api_available'],
-            'current_filters' => $result['current_filters'],
-            'sort_by' => $result['sort_by'],
-            'sort_order' => $result['sort_order'],
+            'users' => $result->getUsers(),
+            'api_available' => $result->isApiAvailable(),
+            'current_filters' => $result->getCurrentFilters(),
+            'sort_by' => $result->getSortBy(),
+            'sort_order' => $result->getSortOrder(),
         ]);
     }
 
@@ -54,17 +55,17 @@ final class UserController extends AbstractController
 
         $result = $this->userService->getUser($token, $id);
 
-        foreach ($result['errors'] as $error) {
+        foreach ($result->getErrors() as $error) {
             $this->addFlash('error', $error);
         }
 
-        if (! $result['user']) {
+        if (! $result->isSuccess() || ! $result->user) {
             return $this->redirectToRoute('admin_users_index');
         }
 
         return $this->render('admin/users/show.html.twig', [
-            'user' => $result['user'],
-            'api_available' => $result['api_available'],
+            'user' => $result->user,
+            'api_available' => $result->isApiAvailable(),
         ]);
     }
 
@@ -81,15 +82,16 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $userData = $form->getData();
-            $result = $this->userService->createUser($token, $userData);
+            $userRequestDto = UserRequestDto::fromArray($userData);
+            $result = $this->userService->createUser($token, $userRequestDto);
 
-            foreach ($result['errors'] as $error) {
+            foreach ($result->getErrors() as $error) {
                 $this->addFlash('error', $error);
             }
 
-            if ($result['success']) {
+            if ($result->isSuccess()) {
                 $this->addFlash('success', 'Użytkownik został pomyślnie utworzony.');
-                return $this->redirectToRoute('admin_users_show', ['id' => $result['user']['id']]);
+                return $this->redirectToRoute('admin_users_show', ['id' => $result->user->id]);
             }
         }
 
@@ -108,39 +110,36 @@ final class UserController extends AbstractController
 
         $result = $this->userService->getUser($token, $id);
 
-        foreach ($result['errors'] as $error) {
+        foreach ($result->getErrors() as $error) {
             $this->addFlash('error', $error);
         }
 
-        if (! $result['user']) {
+        if (! $result->isSuccess() || ! $result->user) {
             return $this->redirectToRoute('admin_users_index');
         }
 
-        $userData = $result['user'];
-
-        if (isset($userData['birthdate']) && is_string($userData['birthdate'])) {
-            $userData['birthdate'] = new \DateTime($userData['birthdate']);
-        }
+        $userData = $result->user->toFormArray();
 
         $form = $this->createForm(UserFormType::class, $userData, ['is_edit' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $userData = $form->getData();
-            $updateResult = $this->userService->updateUser($token, $id, $userData);
+            $userRequestDto = UserRequestDto::fromArray($userData);
+            $updateResult = $this->userService->updateUser($token, $id, $userRequestDto);
 
-            foreach ($updateResult['errors'] as $error) {
+            foreach ($updateResult->getErrors() as $error) {
                 $this->addFlash('error', $error);
             }
 
-            if ($updateResult['success']) {
+            if ($updateResult->isSuccess()) {
                 $this->addFlash('success', 'Użytkownik został pomyślnie zaktualizowany.');
                 return $this->redirectToRoute('admin_users_show', ['id' => $id]);
             }
         }
 
         return $this->render('admin/users/edit.html.twig', [
-            'user' => $result['user'],
+            'user' => $result->user,
             'form' => $form,
         ]);
     }
@@ -155,11 +154,11 @@ final class UserController extends AbstractController
 
         $result = $this->userService->deleteUser($token, $id);
 
-        foreach ($result['errors'] as $error) {
+        foreach ($result->getErrors() as $error) {
             $this->addFlash('error', $error);
         }
 
-        if ($result['success']) {
+        if ($result->isSuccess()) {
             $this->addFlash('success', 'Użytkownik został pomyślnie usunięty.');
         }
 
@@ -176,13 +175,14 @@ final class UserController extends AbstractController
 
         $result = $this->userService->importUsers($token);
 
-        foreach ($result['errors'] as $error) {
+        foreach ($result->getErrors() as $error) {
             $this->addFlash('error', $error);
         }
 
-        if ($result['success']) {
+        if ($result->isSuccess()) {
             $this->addFlash('success', sprintf(
-                'Import zakończony pomyślnie! Zaimportowano 100 użytkowników.',
+                'Import zakończony pomyślnie! Zaimportowano %d użytkowników.',
+                count($result->getUsers())
             ));
         }
 
