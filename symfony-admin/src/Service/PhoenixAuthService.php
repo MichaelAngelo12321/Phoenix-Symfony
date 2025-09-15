@@ -26,7 +26,7 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
         $response = $this->makeApiRequest('POST', '/auth/login', $payload);
 
         if (! $response['success']) {
-            return AuthenticationResultDto::failure($response['error']);
+            return AuthenticationResultDto::failure($response['error'] ?? 'Authentication failed');
         }
 
         return $this->processLoginResponse($response['data']);
@@ -59,16 +59,16 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
             $response = $this->httpClient->request($method, $this->phoenixApiUrl . $endpoint, $options);
             $statusCode = $response->getStatusCode();
 
-            if ($statusCode === HttpStatus::NO_CONTENT->value || $response->getContent(false) === '') {
+            if ($statusCode === 204 || $response->getContent(false) === '') {
                 return [
-                    'success' => true,
+                    'success' => $statusCode >= 200 && $statusCode < 300,
                     'status_code' => $statusCode,
                     'data' => [],
                 ];
             }
 
             return [
-                'success' => true,
+                'success' => $statusCode >= 200 && $statusCode < 300,
                 'status_code' => $statusCode,
                 'data' => $response->toArray(false),
             ];
@@ -100,7 +100,7 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
             $data = $response->toArray(false);
 
             return [
-                'success' => $statusCode === HttpStatus::OK->value,
+                'success' => $statusCode === 200,
                 'status_code' => $statusCode,
                 'data' => $data,
             ];
