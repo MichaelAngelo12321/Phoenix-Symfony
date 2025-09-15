@@ -29,14 +29,14 @@ final class UserFilterType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'constraints' => [
-                    new Assert\Length([
-                        'max' => 50,
-                        'maxMessage' => ValidatorMessage::FIRST_NAME_TOO_LONG->value,
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/',
-                        'message' => 'Imię może zawierać tylko litery',
-                    ]),
+                    new Assert\Length(
+                        max: 50,
+                        maxMessage: ValidatorMessage::FIRST_NAME_TOO_LONG->value,
+                    ),
+                    new Assert\Regex(
+                        pattern: '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/',
+                        message: 'Imię może zawierać tylko litery',
+                    ),
                 ],
             ])
             ->add('lastName', TextType::class, [
@@ -48,14 +48,14 @@ final class UserFilterType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'constraints' => [
-                    new Assert\Length([
-                        'max' => 50,
-                        'maxMessage' => ValidatorMessage::LAST_NAME_TOO_LONG->value,
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s-]+$/',
-                        'message' => 'Nazwisko może zawierać tylko litery, spacje i myślniki',
-                    ]),
+                    new Assert\Length(
+                        max: 50,
+                        maxMessage: ValidatorMessage::LAST_NAME_TOO_LONG->value,
+                    ),
+                    new Assert\Regex(
+                        pattern: '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s-]+$/',
+                        message: 'Nazwisko może zawierać tylko litery, spacje i myślniki',
+                    ),
                 ],
             ])
             ->add('gender', ChoiceType::class, [
@@ -76,10 +76,10 @@ final class UserFilterType extends AbstractType
                 'mapped' => false,
                 'attr' => ['class' => 'form-control'],
                 'constraints' => [
-                    new Assert\LessThanOrEqual([
-                        'value' => 'today',
-                        'message' => ValidatorMessage::DATE_FUTURE->value,
-                    ]),
+                    new Assert\LessThanOrEqual(
+                        value: 'today',
+                        message: ValidatorMessage::DATE_FUTURE->value,
+                    ),
                 ],
             ])
             ->add('birthdateTo', DateType::class, [
@@ -89,10 +89,10 @@ final class UserFilterType extends AbstractType
                 'mapped' => false,
                 'attr' => ['class' => 'form-control'],
                 'constraints' => [
-                    new Assert\LessThanOrEqual([
-                        'value' => 'today',
-                        'message' => ValidatorMessage::DATE_FUTURE->value,
-                    ]),
+                    new Assert\LessThanOrEqual(
+                        value: 'today',
+                        message: ValidatorMessage::DATE_FUTURE->value,
+                    ),
                 ],
             ])
             ->add('sortBy', ChoiceType::class, [

@@ -20,8 +20,8 @@ final class LoginFormType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'Email',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Email jest wymagany']),
-                    new Assert\Email(['message' => 'Podaj prawidłowy adres email']),
+                    new Assert\NotBlank(message: 'Email jest wymagany'),
+                    new Assert\Email(message: 'Podaj prawidłowy adres email'),
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -31,7 +31,7 @@ final class LoginFormType extends AbstractType
             ->add('password', PasswordType::class, [
                 'label' => 'Hasło',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Hasło jest wymagane']),
+                    new Assert\NotBlank(message: 'Hasło jest wymagane'),
                 ],
                 'attr' => [
                     'class' => 'form-control',
