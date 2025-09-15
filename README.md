@@ -227,6 +227,15 @@ docker-compose exec phoenix mix test
 
 # Konkretny test
 docker-compose exec phoenix mix test test/phoenix_api_web/controllers/user_controller_test.exs
+
+### Symfony Admin
+
+```bash
+# Wszystkie testy jednostkowe
+docker-compose exec symfony ./bin/phpunit tests/Unit/
+
+# Konkretny test
+docker-compose exec symfony ./bin/phpunit tests/Unit/Service/PhoenixAuthServiceTest.php
 ```
 
 ## 🚀 Deployment
