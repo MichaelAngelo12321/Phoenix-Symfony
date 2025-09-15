@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Dto\FilterDto;
 use App\Dto\UserListResponseDto;
 use App\Dto\UserRequestDto;
 use App\Dto\UserResponseDto;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * User service interface
@@ -20,7 +20,7 @@ interface UserServiceInterface
     /**
      * Get users with filtering and sorting
      */
-    public function getUsers(string $token, Request $request): UserListResponseDto;
+    public function getUsers(string $token, FilterDto $filterDto): UserListResponseDto;
 
     /**
      * Get single user by ID

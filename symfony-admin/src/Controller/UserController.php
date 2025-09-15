@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\FilterDto;
 use App\Dto\UserRequestDto;
 use App\Enum\UserMessage;
+use App\Form\UserFilterType;
 use App\Form\UserFormType;
 use App\Service\AuthenticationServiceInterface;
 use App\Service\UserServiceInterface;
@@ -31,7 +33,18 @@ final class UserController extends AbstractController
             return $token;
         }
 
-        $result = $this->userService->getUsers($token, $request);
+        $filterForm = $this->createForm(UserFilterType::class);
+        $filterForm->handleRequest($request);
+
+        $filterDto = FilterDto::fromRequest($request);
+
+        if ($filterForm->isSubmitted() && ! $filterForm->isValid()) {
+            foreach ($filterForm->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
+
+        $result = $this->userService->getUsers($token, $filterDto);
 
         foreach ($result->getErrors() as $error) {
             $this->addFlash('error', $error);
@@ -39,10 +52,11 @@ final class UserController extends AbstractController
 
         return $this->render('admin/users/index.html.twig', [
             'users' => $result->users,
+            'current_filters' => $filterDto->getCurrentFilters(),
+            'sort_by' => $filterDto->sortBy,
+            'sort_order' => $filterDto->sortOrder,
+            'filter_form' => $filterForm->createView(),
             'api_available' => $result->isApiAvailable(),
-            'current_filters' => $result->currentFilters,
-            'sort_by' => $result->sortBy,
-            'sort_order' => $result->sortOrder,
         ]);
     }
 
@@ -70,8 +84,8 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+    public function create(Request $request): Response
     {
         $token = $this->authenticationService->getTokenOrRedirect();
         if ($token instanceof Response) {

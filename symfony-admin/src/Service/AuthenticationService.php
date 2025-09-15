@@ -4,43 +4,42 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Constants\AuthConstants;
+use App\Enum\AuthRoute;
+use App\Security\TokenUser;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class AuthenticationService implements AuthenticationServiceInterface
 {
     public function __construct(
-        private RequestStack $requestStack,
+        private Security $security,
         private UrlGeneratorInterface $urlGenerator
     ) {
     }
 
     public function getTokenOrRedirect(): string|RedirectResponse
     {
-        $session = $this->requestStack->getSession();
-        $token = $session->get(AuthConstants::SESSION_ADMIN_TOKEN);
+        $user = $this->security->getUser();
 
-        if (! $token) {
-            $session->getFlashBag()->add('error', 'Musisz się zalogować, aby uzyskać dostęp do tej strony.');
+        if (! $user instanceof TokenUser) {
             return new RedirectResponse(
-                $this->urlGenerator->generate(AuthConstants::ROUTE_LOGIN)
+                $this->urlGenerator->generate(AuthRoute::LOGIN->value)
             );
         }
 
-        return $token;
+        return $user->getToken();
     }
 
     public function isAuthenticated(): bool
     {
-        $session = $this->requestStack->getSession();
-        return $session->has(AuthConstants::SESSION_ADMIN_TOKEN);
+        return $this->security->getUser() instanceof TokenUser;
     }
 
     public function getCurrentToken(): ?string
     {
-        $session = $this->requestStack->getSession();
-        return $session->get(AuthConstants::SESSION_ADMIN_TOKEN);
+        $user = $this->security->getUser();
+
+        return $user instanceof TokenUser ? $user->getToken() : null;
     }
 }

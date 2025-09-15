@@ -24,7 +24,7 @@
                         </form>
                     {% endif %}
                     
-                    <a href="{{ path('admin_users_new') }}" class="btn btn-primary">
+                    <a href="{{ path('admin_users_create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Dodaj Użytkownika
                     </a>
                 </div>
@@ -40,51 +40,41 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="{{ path('admin_users_index') }}" class="row g-3">
+                    {{ form_start(filter_form, {'method': 'GET', 'action': path('admin_users_index'), 'attr': {'class': 'row g-3'}}) }}
                         <div class="col-md-3">
-                            <label for="first_name" class="form-label">Imię</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" 
-                                   value="{{ current_filters.first_name ?? '' }}" placeholder="Wpisz imię...">
+                            {{ form_label(filter_form.firstName) }}
+                            {{ form_widget(filter_form.firstName) }}
+                            {{ form_errors(filter_form.firstName) }}
                         </div>
                         <div class="col-md-3">
-                            <label for="last_name" class="form-label">Nazwisko</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" 
-                                   value="{{ current_filters.last_name ?? '' }}" placeholder="Wpisz nazwisko...">
+                            {{ form_label(filter_form.lastName) }}
+                            {{ form_widget(filter_form.lastName) }}
+                            {{ form_errors(filter_form.lastName) }}
                         </div>
                         <div class="col-md-2">
-                            <label for="gender" class="form-label">Płeć</label>
-                            <select class="form-select" id="gender" name="gender">
-                                <option value="">Wszystkie</option>
-                                <option value="male" {{ current_filters.gender is defined and current_filters.gender == 'male' ? 'selected' : '' }}>Mężczyzna</option>
-                                <option value="female" {{ current_filters.gender is defined and current_filters.gender == 'female' ? 'selected' : '' }}>Kobieta</option>
-                            </select>
+                            {{ form_label(filter_form.gender) }}
+                            {{ form_widget(filter_form.gender) }}
+                            {{ form_errors(filter_form.gender) }}
                         </div>
                         <div class="col-md-2">
-                            <label for="birthdate_from" class="form-label">Data od</label>
-                            <input type="date" class="form-control" id="birthdate_from" name="birthdate_from" 
-                                   value="{{ current_filters.birthdate_from ?? '' }}">
+                            {{ form_label(filter_form.birthdateFrom) }}
+                            {{ form_widget(filter_form.birthdateFrom) }}
+                            {{ form_errors(filter_form.birthdateFrom) }}
                         </div>
                         <div class="col-md-2">
-                            <label for="birthdate_to" class="form-label">Data do</label>
-                            <input type="date" class="form-control" id="birthdate_to" name="birthdate_to" 
-                                   value="{{ current_filters.birthdate_to ?? '' }}">
+                            {{ form_label(filter_form.birthdateTo) }}
+                            {{ form_widget(filter_form.birthdateTo) }}
+                            {{ form_errors(filter_form.birthdateTo) }}
                         </div>
                         <div class="col-md-2">
-                            <label for="sort_by" class="form-label">Sortuj według</label>
-                            <select class="form-select" id="sort_by" name="sort_by">
-                                <option value="id" {{ sort_by == 'id' ? 'selected' : '' }}>ID</option>
-                                <option value="first_name" {{ sort_by == 'first_name' ? 'selected' : '' }}>Imię</option>
-                                <option value="last_name" {{ sort_by == 'last_name' ? 'selected' : '' }}>Nazwisko</option>
-                                <option value="birthdate" {{ sort_by == 'birthdate' ? 'selected' : '' }}>Data urodzenia</option>
-                                <option value="gender" {{ sort_by == 'gender' ? 'selected' : '' }}>Płeć</option>
-                            </select>
+                            {{ form_label(filter_form.sortBy) }}
+                            {{ form_widget(filter_form.sortBy) }}
+                            {{ form_errors(filter_form.sortBy) }}
                         </div>
                         <div class="col-md-2">
-                            <label for="sort_order" class="form-label">Kierunek</label>
-                            <select class="form-select" id="sort_order" name="sort_order">
-                                <option value="asc" {{ sort_order == 'asc' ? 'selected' : '' }}>Rosnąco</option>
-                                <option value="desc" {{ sort_order == 'desc' ? 'selected' : '' }}>Malejąco</option>
-                            </select>
+                            {{ form_label(filter_form.sortOrder) }}
+                            {{ form_widget(filter_form.sortOrder) }}
+                            {{ form_errors(filter_form.sortOrder) }}
                         </div>
                         <div class="col-md-8 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2">
@@ -94,7 +84,7 @@
                                 <i class="fas fa-times"></i> Wyczyść
                             </a>
                         </div>
-                    </form>
+                    {{ form_end(filter_form) }}
                 </div>
             </div>
 
@@ -121,7 +111,7 @@
                                 <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                 <h5>Brak użytkowników</h5>
                                 <p class="text-muted">Nie ma jeszcze żadnych użytkowników w systemie.</p>
-                                <a href="{{ path('admin_users_new') }}" class="btn btn-primary">
+                                <a href="{{ path('admin_users_create') }}" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> Dodaj pierwszego użytkownika
                                 </a>
                             {% endif %}

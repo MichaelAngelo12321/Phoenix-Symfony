@@ -24,10 +24,11 @@ enum GenderEnum: string
 
     public static function fromString(?string $value): ?self
     {
-        if ($value === null) {
-            return null;
-        }
-
-        return self::tryFrom($value);
+        return match ($value) {
+            null, '' => null,
+            '1' => self::MALE,
+            '2' => self::FEMALE,
+            default => self::tryFrom($value)
+        };
     }
 }

@@ -23,6 +23,7 @@ final class UserFilterType extends AbstractType
             ->add('firstName', TextType::class, [
                 'required' => false,
                 'label' => 'Imię',
+                'mapped' => false,
                 'attr' => [
                     'placeholder' => 'Wpisz imię...',
                     'class' => 'form-control',
@@ -41,6 +42,7 @@ final class UserFilterType extends AbstractType
             ->add('lastName', TextType::class, [
                 'required' => false,
                 'label' => 'Nazwisko',
+                'mapped' => false,
                 'attr' => [
                     'placeholder' => 'Wpisz nazwisko...',
                     'class' => 'form-control',
@@ -59,6 +61,7 @@ final class UserFilterType extends AbstractType
             ->add('gender', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Płeć',
+                'mapped' => false,
                 'choices' => [
                     'Wszystkie' => null,
                     'Mężczyzna' => GenderEnum::MALE->value,
@@ -70,6 +73,7 @@ final class UserFilterType extends AbstractType
                 'required' => false,
                 'label' => 'Data urodzenia od',
                 'widget' => 'single_text',
+                'mapped' => false,
                 'attr' => ['class' => 'form-control'],
                 'constraints' => [
                     new Assert\LessThanOrEqual([
@@ -82,17 +86,19 @@ final class UserFilterType extends AbstractType
                 'required' => false,
                 'label' => 'Data urodzenia do',
                 'widget' => 'single_text',
+                'mapped' => false,
                 'attr' => ['class' => 'form-control'],
                 'constraints' => [
                     new Assert\LessThanOrEqual([
                         'value' => 'today',
-                        'message' => 'Data nie może być z przyszłości',
+                        'message' => ValidatorMessage::DATE_FUTURE->value,
                     ]),
                 ],
             ])
             ->add('sortBy', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Sortuj według',
+                'mapped' => false,
                 'choices' => [
                     'ID' => 'id',
                     'Imię' => 'first_name',
@@ -106,6 +112,7 @@ final class UserFilterType extends AbstractType
             ->add('sortOrder', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Kierunek sortowania',
+                'mapped' => false,
                 'choices' => [
                     'Rosnąco' => 'asc',
                     'Malejąco' => 'desc',
@@ -120,7 +127,7 @@ final class UserFilterType extends AbstractType
         $resolver->setDefaults([
             'data_class' => FilterDto::class,
             'method' => 'GET',
-            'csrf_protection' => false,
+            'csrf_protection' => true,
         ]);
     }
 

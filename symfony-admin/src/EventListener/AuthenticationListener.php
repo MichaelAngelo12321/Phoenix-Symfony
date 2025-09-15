@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Constants\AuthConstants;
+use App\Enum\AuthRoute;
+use App\Enum\SessionKey;
 use App\Service\PhoenixAuthServiceInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,8 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class AuthenticationListener
 {
     private array $publicRoutes = [
-        AuthConstants::ROUTE_LOGIN,
-        AuthConstants::ROUTE_LOGOUT,
+        AuthRoute::LOGIN->value,
         'app_check_auth',
     ];
 
@@ -40,10 +40,10 @@ final class AuthenticationListener
         }
 
         $session = $this->requestStack->getSession();
-        $token = $session->get(AuthConstants::SESSION_ADMIN_TOKEN);
+        $token = $session->get(SessionKey::ADMIN_TOKEN->value);
 
         if (! $token) {
-            $loginUrl = $this->urlGenerator->generate(AuthConstants::ROUTE_LOGIN);
+            $loginUrl = $this->urlGenerator->generate(AuthRoute::LOGIN->value);
             $response = new RedirectResponse($loginUrl);
             $event->setResponse($response);
             return;
@@ -52,17 +52,17 @@ final class AuthenticationListener
         $result = $this->phoenixAuthService->verifyToken($token);
 
         if (! $result->isValid()) {
-            $session->remove(AuthConstants::SESSION_ADMIN_TOKEN);
-            $session->remove(AuthConstants::SESSION_ADMIN_DATA);
+            $session->remove(SessionKey::ADMIN_TOKEN->value);
+            $session->remove(SessionKey::ADMIN_DATA->value);
 
-            $loginUrl = $this->urlGenerator->generate(AuthConstants::ROUTE_LOGIN);
+            $loginUrl = $this->urlGenerator->generate(AuthRoute::LOGIN->value);
             $response = new RedirectResponse($loginUrl);
             $event->setResponse($response);
             return;
         }
 
         if ($result->admin) {
-            $session->set(AuthConstants::SESSION_ADMIN_DATA, $result->admin);
+            $session->set(SessionKey::ADMIN_DATA->value, $result->admin);
         }
     }
 }

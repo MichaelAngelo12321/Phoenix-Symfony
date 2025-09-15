@@ -102,6 +102,7 @@ final class UserFormType extends AbstractType
     {
         $resolver->setDefaults([
             'is_edit' => false,
+            'csrf_protection' => true,
         ]);
         $resolver->setAllowedTypes('is_edit', 'bool');
     }

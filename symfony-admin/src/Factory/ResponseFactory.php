@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Factory;
 
 use App\Dto\UserDto;
 use App\Dto\UserListResponseDto;

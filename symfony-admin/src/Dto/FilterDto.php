@@ -25,28 +25,28 @@ final readonly class FilterDto
         $birthdateFrom = null;
         $birthdateTo = null;
 
-        if ($request->query->get('birthdate_from')) {
+        if ($request->query->get('birthdateFrom')) {
             try {
-                $birthdateFrom = new \DateTime($request->query->get('birthdate_from'));
+                $birthdateFrom = new \DateTime($request->query->get('birthdateFrom'));
             } catch (\Exception) {
             }
         }
 
-        if ($request->query->get('birthdate_to')) {
+        if ($request->query->get('birthdateTo')) {
             try {
-                $birthdateTo = new \DateTime($request->query->get('birthdate_to'));
+                $birthdateTo = new \DateTime($request->query->get('birthdateTo'));
             } catch (\Exception) {
             }
         }
 
         return new self(
-            firstName: $request->query->get('first_name') ?: null,
-            lastName: $request->query->get('last_name') ?: null,
+            firstName: $request->query->get('firstName') ?: null,
+            lastName: $request->query->get('lastName') ?: null,
             gender: GenderEnum::fromString($request->query->get('gender')),
             birthdateFrom: $birthdateFrom,
             birthdateTo: $birthdateTo,
-            sortBy: self::validateSortBy($request->query->get('sort_by', 'id')),
-            sortOrder: self::validateSortOrder($request->query->get('sort_order', 'asc'))
+            sortBy: self::validateSortBy($request->query->get('sortBy', 'id')),
+            sortOrder: self::validateSortOrder($request->query->get('sortOrder', 'asc'))
         );
     }
 

@@ -6,8 +6,8 @@ namespace App\Service;
 
 use App\Dto\AuthenticationResultDto;
 use App\Dto\TokenVerificationResultDto;
+use App\Enum\HttpStatus;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -56,12 +56,10 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
             ];
 
             $options = array_merge_recursive($defaultOptions, $options);
-
             $response = $this->httpClient->request($method, $this->phoenixApiUrl . $endpoint, $options);
-
             $statusCode = $response->getStatusCode();
 
-            if ($statusCode === 204 || $response->getContent(false) === '') {
+            if ($statusCode === HttpStatus::NO_CONTENT->value || $response->getContent(false) === '') {
                 return [
                     'success' => true,
                     'status_code' => $statusCode,
@@ -102,7 +100,7 @@ final readonly class PhoenixAuthService implements PhoenixAuthServiceInterface
             $data = $response->toArray(false);
 
             return [
-                'success' => $statusCode === Response::HTTP_OK,
+                'success' => $statusCode === HttpStatus::OK->value,
                 'status_code' => $statusCode,
                 'data' => $data,
             ];

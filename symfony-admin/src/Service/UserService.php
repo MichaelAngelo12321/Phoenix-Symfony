@@ -9,9 +9,9 @@ use App\Dto\UserListResponseDto;
 use App\Dto\UserRequestDto;
 use App\Dto\UserResponseDto;
 use App\Enum\UserMessage;
+use App\Factory\ResponseFactoryInterface;
 use App\Mapper\UserMapper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 final readonly class UserService implements UserServiceInterface
 {
@@ -22,10 +22,9 @@ final readonly class UserService implements UserServiceInterface
     ) {
     }
 
-    public function getUsers(string $token, Request $request): UserListResponseDto
+    public function getUsers(string $token, FilterDto $filterDto): UserListResponseDto
     {
         try {
-            $filterDto = FilterDto::fromRequest($request);
             $filters = $filterDto->toArray();
 
             $apiResponse = $this->phoenixApiService->getUsers($token, $filters);
