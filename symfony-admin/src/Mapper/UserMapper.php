@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Mapper;
 
 use App\Dto\UserDto;
-use App\Dto\UserListResponseDto;
 use App\Dto\UserRequestDto;
-use App\Dto\UserResponseDto;
 use App\Enum\GenderEnum;
 
 final readonly class UserMapper
@@ -73,35 +71,6 @@ final readonly class UserMapper
             $requestDto->birthdate,
             $requestDto->gender
         );
-    }
-
-    public static function createSuccessResponse(UserDto $user, ?string $message = null): UserResponseDto
-    {
-        return UserResponseDto::success($user, $message);
-    }
-
-    public static function createFailureResponse(array $errors, bool $apiAvailable = true): UserResponseDto
-    {
-        return UserResponseDto::failure($errors, $apiAvailable);
-    }
-
-    public static function createUserListSuccessResponse(
-        array $users,
-        array $currentFilters = [],
-        string $sortBy = 'id',
-        string $sortOrder = 'asc'
-    ): UserListResponseDto {
-        return UserListResponseDto::success(
-            $users,
-            $currentFilters,
-            $sortBy,
-            $sortOrder
-        );
-    }
-
-    public static function createUserListFailureResponse(array $errors, bool $apiAvailable = true): UserListResponseDto
-    {
-        return UserListResponseDto::failure($errors, $apiAvailable);
     }
 
     public static function mapApiErrorToErrors(\Exception $exception): array

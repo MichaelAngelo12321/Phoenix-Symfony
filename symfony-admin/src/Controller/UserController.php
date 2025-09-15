@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Dto\UserRequestDto;
+use App\Enum\UserMessage;
 use App\Form\UserFormType;
 use App\Service\AuthenticationServiceInterface;
 use App\Service\UserServiceInterface;
@@ -90,7 +91,7 @@ final class UserController extends AbstractController
             }
 
             if ($result->isSuccess()) {
-                $this->addFlash('success', 'Użytkownik został pomyślnie utworzony.');
+                $this->addFlash('success', UserMessage::USER_CREATED->value);
                 return $this->redirectToRoute('admin_users_show', ['id' => $result->user->id]);
             }
         }
@@ -133,7 +134,7 @@ final class UserController extends AbstractController
             }
 
             if ($updateResult->isSuccess()) {
-                $this->addFlash('success', 'Użytkownik został pomyślnie zaktualizowany.');
+                $this->addFlash('success', UserMessage::USER_UPDATED->value);
                 return $this->redirectToRoute('admin_users_show', ['id' => $id]);
             }
         }
@@ -159,7 +160,7 @@ final class UserController extends AbstractController
         }
 
         if ($result->isSuccess()) {
-            $this->addFlash('success', 'Użytkownik został pomyślnie usunięty.');
+            $this->addFlash('success', UserMessage::USER_DELETED->value);
         }
 
         return $this->redirectToRoute('admin_users_index');
@@ -180,10 +181,10 @@ final class UserController extends AbstractController
         }
 
         if ($result->isSuccess()) {
-            $this->addFlash('success', sprintf(
-                'Import zakończony pomyślnie! Zaimportowano 100 użytkowników.',
-                count($result->users)
-            ));
+            $this->addFlash(
+                'success',
+                sprintf(UserMessage::USERS_IMPORTED->value, 100)
+            );
         }
 
         return $this->redirectToRoute('admin_users_index');

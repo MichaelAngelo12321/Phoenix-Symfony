@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use App\Enum\GenderEnum;
+use App\Enum\ValidatorMessage;
 
 final readonly class UserRequestDto
 {
@@ -19,8 +20,8 @@ final readonly class UserRequestDto
     public static function fromArray(array $data): self
     {
         return new self(
-            firstName: $data['first_name'] ?? $data['firstName'] ?? null,
-            lastName: $data['last_name'] ?? $data['lastName'] ?? null,
+            firstName: $data['first_name'] ?? null,
+            lastName: $data['last_name'] ?? null,
             birthdate: $data['birthdate'] ?? null,
             gender: GenderEnum::fromString($data['gender'] ?? null)
         );
@@ -46,30 +47,55 @@ final readonly class UserRequestDto
 
     public function getValidationErrors(): array
     {
-        $errors = [];
+        return array_filter([
+            'firstName' => $this->validateFirstName(),
+            'lastName' => $this->validateLastName(),
+            'birthdate' => $this->validateBirthdate(),
+            'gender' => $this->validateGender(),
+        ]);
+    }
 
+    private function validateFirstName(): ?string
+    {
         if (empty($this->firstName)) {
-            $errors['firstName'] = 'Imię jest wymagane';
-        } elseif (strlen($this->firstName) < 2) {
-            $errors['firstName'] = 'Imię musi mieć co najmniej 2 znaki';
+            return ValidatorMessage::FIRST_NAME_REQUIRED->value;
         }
 
+        if (strlen($this->firstName) < 2) {
+            return ValidatorMessage::FIRST_NAME_TOO_SHORT->value;
+        }
+
+        return null;
+    }
+
+    private function validateLastName(): ?string
+    {
         if (empty($this->lastName)) {
-            $errors['lastName'] = 'Nazwisko jest wymagane';
-        } elseif (strlen($this->lastName) < 2) {
-            $errors['lastName'] = 'Nazwisko musi mieć co najmniej 2 znaki';
+            return ValidatorMessage::LAST_NAME_REQUIRED->value;
         }
 
-        if ($this->birthdate === null) {
-            $errors['birthdate'] = 'Data urodzenia jest wymagana';
-        } elseif ($this->birthdate > new \DateTime()) {
-            $errors['birthdate'] = 'Data urodzenia nie może być z przyszłości';
+        if (strlen($this->lastName) < 2) {
+            return ValidatorMessage::LAST_NAME_TOO_SHORT->value;
         }
 
-        if ($this->gender === null) {
-            $errors['gender'] = 'Płeć jest wymagana';
+        return null;
+    }
+
+    private function validateBirthdate(): ?string
+    {
+        if (empty($this->birthdate)) {
+            return ValidatorMessage::BIRTHDATE_REQUIRED->value;
         }
 
-        return $errors;
+        if ($this->birthdate > new \DateTime()) {
+            return ValidatorMessage::BIRTHDATE_FUTURE->value;
+        }
+
+        return null;
+    }
+
+    private function validateGender(): ?string
+    {
+        return $this->gender === null ? ValidatorMessage::GENDER_REQUIRED->value : null;
     }
 }

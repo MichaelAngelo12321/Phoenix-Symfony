@@ -6,6 +6,7 @@ namespace App\Form;
 
 use App\Dto\FilterDto;
 use App\Enum\GenderEnum;
+use App\Enum\ValidatorMessage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -29,7 +30,7 @@ final class UserFilterType extends AbstractType
                 'constraints' => [
                     new Assert\Length([
                         'max' => 50,
-                        'maxMessage' => 'Imię nie może być dłuższe niż {{ limit }} znaków',
+                        'maxMessage' => ValidatorMessage::FIRST_NAME_TOO_LONG->value,
                     ]),
                     new Assert\Regex([
                         'pattern' => '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/',
@@ -47,7 +48,7 @@ final class UserFilterType extends AbstractType
                 'constraints' => [
                     new Assert\Length([
                         'max' => 50,
-                        'maxMessage' => 'Nazwisko nie może być dłuższe niż {{ limit }} znaków',
+                        'maxMessage' => ValidatorMessage::LAST_NAME_TOO_LONG->value,
                     ]),
                     new Assert\Regex([
                         'pattern' => '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s-]+$/',
@@ -73,7 +74,7 @@ final class UserFilterType extends AbstractType
                 'constraints' => [
                     new Assert\LessThanOrEqual([
                         'value' => 'today',
-                        'message' => 'Data nie może być z przyszłości',
+                        'message' => ValidatorMessage::DATE_FUTURE->value,
                     ]),
                 ],
             ])

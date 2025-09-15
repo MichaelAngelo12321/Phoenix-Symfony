@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Enum\ValidatorMessage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -20,12 +21,12 @@ final class UserFormType extends AbstractType
             ->add('first_name', TextType::class, [
                 'label' => 'Imię',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Imię jest wymagane']),
+                    new Assert\NotBlank(['message' => ValidatorMessage::FIRST_NAME_REQUIRED->value]),
                     new Assert\Length([
                         'min' => 2,
                         'max' => 50,
-                        'minMessage' => 'Imię musi mieć co najmniej {{ limit }} znaki',
-                        'maxMessage' => 'Imię nie może być dłuższe niż {{ limit }} znaków',
+                        'minMessage' => ValidatorMessage::FIRST_NAME_TOO_SHORT->value,
+                        'maxMessage' => ValidatorMessage::FIRST_NAME_TOO_LONG->value,
                     ]),
                     new Assert\Regex([
                         'pattern' => '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/',
@@ -40,12 +41,12 @@ final class UserFormType extends AbstractType
             ->add('last_name', TextType::class, [
                 'label' => 'Nazwisko',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Nazwisko jest wymagane']),
+                    new Assert\NotBlank(['message' => ValidatorMessage::LAST_NAME_REQUIRED->value]),
                     new Assert\Length([
                         'min' => 2,
                         'max' => 50,
-                        'minMessage' => 'Nazwisko musi mieć co najmniej {{ limit }} znaki',
-                        'maxMessage' => 'Nazwisko nie może być dłuższe niż {{ limit }} znaków',
+                        'minMessage' => ValidatorMessage::LAST_NAME_TOO_SHORT->value,
+                        'maxMessage' => ValidatorMessage::LAST_NAME_TOO_LONG->value,
                     ]),
                     new Assert\Regex([
                         'pattern' => '/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s-]+$/',
@@ -64,11 +65,11 @@ final class UserFormType extends AbstractType
                     new Assert\NotBlank(['message' => 'Data urodzenia jest wymagana']),
                     new Assert\LessThan([
                         'value' => 'today',
-                        'message' => 'Data urodzenia nie może być z przyszłości',
+                        'message' => ValidatorMessage::BIRTHDATE_FUTURE->value,
                     ]),
                     new Assert\GreaterThan([
                         'value' => '1900-01-01',
-                        'message' => 'Data urodzenia nie może być wcześniejsza niż 1900 rok',
+                        'message' => ValidatorMessage::BIRTHDATE_TOO_OLD->value,
                     ]),
                 ],
                 'attr' => [
