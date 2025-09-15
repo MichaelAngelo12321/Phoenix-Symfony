@@ -5,20 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Form;
 
 use App\Form\UserFormType;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
 final class UserFormTypeTest extends TypeTestCase
 {
-    protected function getExtensions(): array
-    {
-        $validator = Validation::createValidator();
-
-        return [
-            new ValidatorExtension($validator),
-        ];
-    }
 
     public function testSubmitValidData(): void
     {
@@ -33,15 +25,15 @@ final class UserFormTypeTest extends TypeTestCase
         $form->submit($formData);
 
         $this->assertTrue($form->isSynchronized());
-        
-        if (!$form->isValid()) {
+
+        if (! $form->isValid()) {
             foreach ($form->getErrors(true) as $error) {
-                echo "Form error: " . $error->getMessage() . "\n";
+                echo 'Form error: ' . $error->getMessage() . "\n";
             }
         }
-        
+
         $this->assertTrue($form->isValid());
-        
+
         $data = $form->getData();
         $this->assertEquals('Jan', $data['first_name']);
         $this->assertEquals('Kowalski', $data['last_name']);
@@ -272,11 +264,19 @@ final class UserFormTypeTest extends TypeTestCase
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());
-        
+
         $data = $form->getData();
         $this->assertEquals('Łukasz', $data['first_name']);
         $this->assertEquals('Żółć-Ąćęłńóśźż', $data['last_name']);
         $this->assertEquals('male', $data['gender']);
         $this->assertInstanceOf(\DateTime::class, $data['birthdate']);
+    }
+    protected function getExtensions(): array
+    {
+        $validator = Validation::createValidator();
+
+        return [
+            new ValidatorExtension($validator),
+        ];
     }
 }

@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Service;
 use App\Dto\FilterDto;
 use App\Dto\UserDto;
 use App\Dto\UserListResponseDto;
-use App\Dto\UserRequestDto;
 use App\Dto\UserResponseDto;
 use App\Enum\UserMessage;
 use App\Factory\ResponseFactoryInterface;
@@ -30,7 +29,7 @@ final class UserServiceTest extends TestCase
         $this->phoenixApiService = $this->createMock(PhoenixApiServiceInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->responseFactory = $this->createMock(ResponseFactoryInterface::class);
-        
+
         $this->userService = new UserService(
             $this->phoenixApiService,
             $this->logger,
@@ -44,7 +43,7 @@ final class UserServiceTest extends TestCase
         $request = new Request();
         $filterDto = FilterDto::fromRequest($request);
         $exception = new \Exception('API Error');
-        
+
         $expectedResponse = UserListResponseDto::failure(['API fetch users error']);
 
         $this->phoenixApiService
@@ -70,7 +69,7 @@ final class UserServiceTest extends TestCase
         $token = 'test-token';
         $userId = 1;
         $apiResponse = ['data' => ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com']];
-        
+
         $expectedUser = new UserDto(1, 'John Doe', 'john@example.com', null, null);
         $expectedResponse = new UserResponseDto(
             success: true,
@@ -100,7 +99,7 @@ final class UserServiceTest extends TestCase
         $token = 'test-token';
         $userId = 1;
         $apiResponse = ['data' => null];
-        
+
         $expectedResponse = new UserResponseDto(
             success: false,
             user: null,
@@ -143,7 +142,7 @@ final class UserServiceTest extends TestCase
         $token = 'test-token';
         $userId = 1;
         $exception = new \Exception('API Error');
-        
+
         $expectedResponse = new UserResponseDto(
             success: false,
             user: null,
@@ -174,12 +173,13 @@ final class UserServiceTest extends TestCase
         $token = 'test-token';
         $apiResponse = ['data' => [
             ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com'],
-            ['id' => 2, 'name' => 'Jane Doe', 'email' => 'jane@example.com']
-        ]];
-        
+            ['id' => 2, 'name' => 'Jane Doe', 'email' => 'jane@example.com'],
+        ],
+        ];
+
         $expectedUsers = [
             new UserDto(1, 'John Doe', 'john@example.com', null, null),
-            new UserDto(2, 'Jane Doe', 'jane@example.com', null, null)
+            new UserDto(2, 'Jane Doe', 'jane@example.com', null, null),
         ];
         $expectedResponse = new UserListResponseDto(
             success: true,

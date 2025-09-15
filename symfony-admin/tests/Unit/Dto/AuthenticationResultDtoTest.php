@@ -13,9 +13,9 @@ final class AuthenticationResultDtoTest extends TestCase
     {
         $token = 'test-token-123';
         $admin = ['id' => 1, 'email' => 'admin@example.com'];
-        
+
         $dto = AuthenticationResultDto::success($token, $admin);
-        
+
         $this->assertTrue($dto->isSuccess());
         $this->assertFalse($dto->isFailure());
         $this->assertEquals($token, $dto->token);
@@ -26,9 +26,9 @@ final class AuthenticationResultDtoTest extends TestCase
     public function testFailureCreation(): void
     {
         $error = 'Invalid credentials';
-        
+
         $dto = AuthenticationResultDto::failure($error);
-        
+
         $this->assertFalse($dto->isSuccess());
         $this->assertTrue($dto->isFailure());
         $this->assertEquals($error, $dto->error);
@@ -40,9 +40,9 @@ final class AuthenticationResultDtoTest extends TestCase
     {
         $token = 'test-token';
         $admin = [];
-        
+
         $dto = AuthenticationResultDto::success($token, $admin);
-        
+
         $this->assertTrue($dto->isSuccess());
         $this->assertFalse($dto->isFailure());
         $this->assertEquals($token, $dto->token);
@@ -54,7 +54,7 @@ final class AuthenticationResultDtoTest extends TestCase
     {
         $successDto = AuthenticationResultDto::success('token', ['id' => 1]);
         $failureDto = AuthenticationResultDto::failure('error');
-        
+
         $this->assertTrue($successDto->isSuccess());
         $this->assertFalse($failureDto->isSuccess());
     }
@@ -63,7 +63,7 @@ final class AuthenticationResultDtoTest extends TestCase
     {
         $successDto = AuthenticationResultDto::success('token', ['id' => 1]);
         $failureDto = AuthenticationResultDto::failure('error');
-        
+
         $this->assertFalse($successDto->isFailure());
         $this->assertTrue($failureDto->isFailure());
     }

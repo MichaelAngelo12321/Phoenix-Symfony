@@ -24,7 +24,7 @@ final class AuthenticationServiceTest extends TestCase
     {
         $this->security = $this->createMock(Security::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        
+
         $this->authenticationService = new AuthenticationService(
             $this->security,
             $this->urlGenerator

@@ -21,7 +21,7 @@ final class HttpStatusTest extends TestCase
     public function testHttpStatusCases(): void
     {
         $cases = HttpStatus::cases();
-        
+
         $this->assertCount(5, $cases);
         $this->assertContains(HttpStatus::OK, $cases);
         $this->assertContains(HttpStatus::CREATED, $cases);

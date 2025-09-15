@@ -27,7 +27,7 @@ final class PhoenixApiServiceTest extends TestCase
         $this->httpClient = $this->createMock(HttpClientInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->authService = $this->createMock(PhoenixAuthServiceInterface::class);
-        
+
         $this->phoenixApiService = new PhoenixApiService(
             $this->httpClient,
             $this->logger,
@@ -43,14 +43,14 @@ final class PhoenixApiServiceTest extends TestCase
         $expectedResult = [
             'data' => [
                 ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'],
-                ['id' => 2, 'first_name' => 'Jane', 'last_name' => 'Smith']
-            ]
+                ['id' => 2, 'first_name' => 'Jane', 'last_name' => 'Smith'],
+            ],
         ];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::OK->value,
-            'data' => $expectedResult
+            'data' => $expectedResult,
         ];
 
         $this->authService
@@ -64,7 +64,7 @@ final class PhoenixApiServiceTest extends TestCase
             ->method('info')
             ->with('Successfully fetched users from Phoenix API', [
                 'count' => 2,
-                'params' => $params
+                'params' => $params,
             ]);
 
         $result = $this->phoenixApiService->getUsers($token, $params);
@@ -76,11 +76,11 @@ final class PhoenixApiServiceTest extends TestCase
     {
         $token = 'test-token';
         $expectedResult = ['data' => []];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::OK->value,
-            'data' => $expectedResult
+            'data' => $expectedResult,
         ];
 
         $this->authService
@@ -99,13 +99,13 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $userId = 1;
         $expectedResult = [
-            'data' => ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe']
+            'data' => ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'],
         ];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::OK->value,
-            'data' => $expectedResult
+            'data' => $expectedResult,
         ];
 
         $this->authService
@@ -128,11 +128,11 @@ final class PhoenixApiServiceTest extends TestCase
     {
         $token = 'test-token';
         $userId = 999;
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::NOT_FOUND->value,
-            'data' => null
+            'data' => null,
         ];
 
         $this->authService
@@ -152,13 +152,13 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $userData = ['first_name' => 'John', 'last_name' => 'Doe'];
         $expectedResult = [
-            'data' => ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe']
+            'data' => ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'],
         ];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::CREATED->value,
-            'data' => $expectedResult
+            'data' => $expectedResult,
         ];
 
         $this->authService
@@ -182,11 +182,11 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $userData = ['first_name' => ''];
         $errors = ['first_name' => ['cannot be blank']];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::UNPROCESSABLE_ENTITY->value,
-            'data' => ['errors' => $errors]
+            'data' => ['errors' => $errors],
         ];
 
         $this->authService
@@ -199,7 +199,7 @@ final class PhoenixApiServiceTest extends TestCase
             ->method('warning')
             ->with('Validation error when creating user', [
                 'errors' => $errors,
-                'user_data' => $userData
+                'user_data' => $userData,
             ]);
 
         $this->expectException(PhoenixApiException::class);
@@ -213,13 +213,13 @@ final class PhoenixApiServiceTest extends TestCase
         $userId = 1;
         $userData = ['first_name' => 'John Updated'];
         $expectedResult = [
-            'data' => ['id' => 1, 'first_name' => 'John Updated', 'last_name' => 'Doe']
+            'data' => ['id' => 1, 'first_name' => 'John Updated', 'last_name' => 'Doe'],
         ];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::OK->value,
-            'data' => $expectedResult
+            'data' => $expectedResult,
         ];
 
         $this->authService
@@ -243,11 +243,11 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $userId = 999;
         $userData = ['first_name' => 'John'];
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::NOT_FOUND->value,
-            'data' => null
+            'data' => null,
         ];
 
         $this->authService
@@ -265,11 +265,11 @@ final class PhoenixApiServiceTest extends TestCase
     {
         $token = 'test-token';
         $userId = 1;
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::NO_CONTENT->value,
-            'data' => null
+            'data' => null,
         ];
 
         $this->authService
@@ -292,11 +292,11 @@ final class PhoenixApiServiceTest extends TestCase
     {
         $token = 'test-token';
         $userId = 999;
-        
+
         $authResponse = [
             'success' => true,
             'status_code' => HttpStatus::NOT_FOUND->value,
-            'data' => null
+            'data' => null,
         ];
 
         $this->authService
@@ -315,7 +315,7 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $expectedResult = [
             'success' => true,
-            'data' => ['imported' => 5]
+            'data' => ['imported' => 5],
         ];
 
         $this->authService
@@ -334,7 +334,7 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $authResponse = [
             'success' => false,
-            'error' => 'Import failed'
+            'error' => 'Import failed',
         ];
 
         $this->authService
@@ -384,7 +384,7 @@ final class PhoenixApiServiceTest extends TestCase
             ->expects($this->once())
             ->method('warning')
             ->with('Phoenix API availability check failed', [
-                'error' => 'Connection failed'
+                'error' => 'Connection failed',
             ]);
 
         $result = $this->phoenixApiService->isApiAvailable();
@@ -397,7 +397,7 @@ final class PhoenixApiServiceTest extends TestCase
         $token = 'test-token';
         $authResponse = [
             'success' => false,
-            'error' => 'Connection failed'
+            'error' => 'Connection failed',
         ];
 
         $this->authService

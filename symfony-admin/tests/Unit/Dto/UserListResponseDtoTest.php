@@ -15,14 +15,14 @@ final class UserListResponseDtoTest extends TestCase
     {
         $users = [
             new UserDto(1, 'John', 'Doe'),
-            new UserDto(2, 'Jane', 'Smith')
+            new UserDto(2, 'Jane', 'Smith'),
         ];
         $currentFilters = ['gender' => 'male'];
         $sortBy = 'firstName';
         $sortOrder = 'desc';
-        
+
         $dto = UserListResponseDto::success($users, $currentFilters, $sortBy, $sortOrder);
-        
+
         $this->assertTrue($dto->isSuccess());
         $this->assertEquals($users, $dto->users);
         $this->assertEquals($currentFilters, $dto->currentFilters);
@@ -35,9 +35,9 @@ final class UserListResponseDtoTest extends TestCase
     public function testSuccessWithDefaults(): void
     {
         $users = [new UserDto(1, 'John', 'Doe')];
-        
+
         $dto = UserListResponseDto::success($users);
-        
+
         $this->assertTrue($dto->isSuccess());
         $this->assertEquals($users, $dto->users);
         $this->assertEquals([], $dto->currentFilters);
@@ -50,7 +50,7 @@ final class UserListResponseDtoTest extends TestCase
     public function testSuccessWithEmptyUsers(): void
     {
         $dto = UserListResponseDto::success([]);
-        
+
         $this->assertTrue($dto->isSuccess());
         $this->assertEquals([], $dto->users);
         $this->assertEquals([], $dto->currentFilters);
@@ -63,9 +63,9 @@ final class UserListResponseDtoTest extends TestCase
     public function testFailureCreation(): void
     {
         $errors = ['Invalid request', 'Missing parameter'];
-        
+
         $dto = UserListResponseDto::failure($errors);
-        
+
         $this->assertFalse($dto->isSuccess());
         $this->assertEquals([], $dto->users);
         $this->assertEquals($errors, $dto->errors);
@@ -76,9 +76,9 @@ final class UserListResponseDtoTest extends TestCase
     public function testFailureWithApiUnavailable(): void
     {
         $errors = ['Service down'];
-        
+
         $dto = UserListResponseDto::failure($errors, false);
-        
+
         $this->assertFalse($dto->isSuccess());
         $this->assertEquals([], $dto->users);
         $this->assertEquals($errors, $dto->errors);
@@ -88,7 +88,7 @@ final class UserListResponseDtoTest extends TestCase
     public function testApiUnavailable(): void
     {
         $dto = UserListResponseDto::apiUnavailable();
-        
+
         $this->assertFalse($dto->isSuccess());
         $this->assertEquals([], $dto->users);
         $this->assertEquals(['API jest niedostępne'], $dto->errors);
@@ -98,9 +98,9 @@ final class UserListResponseDtoTest extends TestCase
     public function testApiUnavailableWithCustomError(): void
     {
         $error = 'Custom API error';
-        
+
         $dto = UserListResponseDto::apiUnavailable($error);
-        
+
         $this->assertFalse($dto->isSuccess());
         $this->assertEquals([], $dto->users);
         $this->assertEquals([$error], $dto->errors);
@@ -111,25 +111,25 @@ final class UserListResponseDtoTest extends TestCase
     {
         $users = [
             new UserDto(1, 'John', 'Doe', null, GenderEnum::MALE),
-            new UserDto(2, 'Jane', 'Smith', null, GenderEnum::FEMALE)
+            new UserDto(2, 'Jane', 'Smith', null, GenderEnum::FEMALE),
         ];
         $currentFilters = ['gender' => 'male'];
-        
+
         $dto = UserListResponseDto::success($users, $currentFilters, 'firstName', 'desc');
-        
+
         $array = $dto->toArray();
-        
+
         $this->assertEquals([
             'success' => true,
             'users' => [
                 ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe', 'gender' => 'male'],
-                ['id' => 2, 'first_name' => 'Jane', 'last_name' => 'Smith', 'gender' => 'female']
+                ['id' => 2, 'first_name' => 'Jane', 'last_name' => 'Smith', 'gender' => 'female'],
             ],
             'errors' => [],
             'api_available' => true,
             'current_filters' => ['gender' => 'male'],
             'sort_by' => 'firstName',
-            'sort_order' => 'desc'
+            'sort_order' => 'desc',
         ], $array);
     }
 
@@ -137,9 +137,9 @@ final class UserListResponseDtoTest extends TestCase
     {
         $errors = ['Error message'];
         $dto = UserListResponseDto::failure($errors, false);
-        
+
         $array = $dto->toArray();
-        
+
         $this->assertEquals([
             'success' => false,
             'users' => [],
@@ -147,7 +147,7 @@ final class UserListResponseDtoTest extends TestCase
             'api_available' => false,
             'current_filters' => [],
             'sort_by' => 'id',
-            'sort_order' => 'asc'
+            'sort_order' => 'asc',
         ], $array);
     }
 }

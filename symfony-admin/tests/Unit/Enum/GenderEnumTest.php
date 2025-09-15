@@ -53,7 +53,7 @@ final class GenderEnumTest extends TestCase
     public function testValues(): void
     {
         $values = GenderEnum::values();
-        
+
         $this->assertCount(2, $values);
         $this->assertContains('male', $values);
         $this->assertContains('female', $values);
@@ -72,14 +72,14 @@ final class GenderEnumTest extends TestCase
             ['3', null],
             ['0', null],
             ['MALE', null],
-            ['FEMALE', null], 
+            ['FEMALE', null],
         ];
 
         foreach ($testCases as [$input, $expected]) {
             $this->assertSame(
                 $expected,
                 GenderEnum::fromString($input),
-                "Failed for input: " . var_export($input, true)
+                'Failed for input: ' . var_export($input, true)
             );
         }
     }

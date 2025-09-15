@@ -19,7 +19,7 @@ final class AuthMessageTest extends TestCase
     public function testAuthMessageCases(): void
     {
         $cases = AuthMessage::cases();
-        
+
         $this->assertCount(3, $cases);
         $this->assertContains(AuthMessage::LOGIN_SUCCESS, $cases);
         $this->assertContains(AuthMessage::NO_TOKEN, $cases);

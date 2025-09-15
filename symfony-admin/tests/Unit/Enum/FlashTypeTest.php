@@ -18,7 +18,7 @@ final class FlashTypeTest extends TestCase
     public function testFlashTypeCases(): void
     {
         $cases = FlashType::cases();
-        
+
         $this->assertCount(2, $cases);
         $this->assertContains(FlashType::SUCCESS, $cases);
         $this->assertContains(FlashType::ERROR, $cases);

@@ -18,7 +18,7 @@ final class FilterDtoTest extends TestCase
             'lastName' => 'Doe',
             'gender' => 'male',
             'sortBy' => 'first_name',
-            'sortOrder' => 'desc'
+            'sortOrder' => 'desc',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -46,7 +46,7 @@ final class FilterDtoTest extends TestCase
     public function testFromRequestWithInvalidGender(): void
     {
         $request = Request::create('/users', 'GET', [
-            'gender' => 'invalid'
+            'gender' => 'invalid',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -57,14 +57,14 @@ final class FilterDtoTest extends TestCase
     public function testFromRequestWithNumericGenderValues(): void
     {
         $request = Request::create('/users', 'GET', [
-            'gender' => '1'
+            'gender' => '1',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
         $this->assertSame(GenderEnum::MALE, $filterDto->gender);
 
         $request = Request::create('/users', 'GET', [
-            'gender' => '2'
+            'gender' => '2',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -74,14 +74,14 @@ final class FilterDtoTest extends TestCase
     public function testFromRequestWithStringGenderValues(): void
     {
         $request = Request::create('/users', 'GET', [
-            'gender' => 'male'
+            'gender' => 'male',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
         $this->assertSame(GenderEnum::MALE, $filterDto->gender);
 
         $request = Request::create('/users', 'GET', [
-            'gender' => 'female'
+            'gender' => 'female',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -92,7 +92,7 @@ final class FilterDtoTest extends TestCase
     {
         $request = Request::create('/users', 'GET', [
             'birthdateFrom' => '1990-01-01',
-            'birthdateTo' => '2000-12-31'
+            'birthdateTo' => '2000-12-31',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -107,7 +107,7 @@ final class FilterDtoTest extends TestCase
     {
         $request = Request::create('/users', 'GET', [
             'birthdateFrom' => 'invalid-date',
-            'birthdateTo' => 'also-invalid'
+            'birthdateTo' => 'also-invalid',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -119,7 +119,7 @@ final class FilterDtoTest extends TestCase
     public function testValidateSortBy(): void
     {
         $request = Request::create('/users', 'GET', [
-            'sortBy' => 'invalid_field'
+            'sortBy' => 'invalid_field',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);
@@ -130,7 +130,7 @@ final class FilterDtoTest extends TestCase
     public function testValidateSortOrder(): void
     {
         $request = Request::create('/users', 'GET', [
-            'sortOrder' => 'invalid_order'
+            'sortOrder' => 'invalid_order',
         ]);
 
         $filterDto = FilterDto::fromRequest($request);

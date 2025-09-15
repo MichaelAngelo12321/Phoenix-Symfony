@@ -31,7 +31,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserSuccessResponseWithMessage(): void
     {
         $message = 'Użytkownik został utworzony pomyślnie';
-        
+
         $response = $this->responseFactory->createUserSuccessResponse($this->sampleUser, $message);
 
         $this->assertInstanceOf(UserResponseDto::class, $response);
@@ -57,7 +57,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserFailureResponseWithApiAvailable(): void
     {
         $errors = ['Błąd walidacji', 'Nieprawidłowe dane'];
-        
+
         $response = $this->responseFactory->createUserFailureResponse($errors, true);
 
         $this->assertInstanceOf(UserResponseDto::class, $response);
@@ -71,7 +71,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserFailureResponseWithApiUnavailable(): void
     {
         $errors = ['API jest niedostępne'];
-        
+
         $response = $this->responseFactory->createUserFailureResponse($errors, false);
 
         $this->assertInstanceOf(UserResponseDto::class, $response);
@@ -85,7 +85,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserFailureResponseWithDefaultApiAvailable(): void
     {
         $errors = ['Błąd serwera'];
-        
+
         $response = $this->responseFactory->createUserFailureResponse($errors);
 
         $this->assertInstanceOf(UserResponseDto::class, $response);
@@ -100,7 +100,7 @@ final class ResponseFactoryTest extends TestCase
         $currentFilters = ['firstName' => 'Jan', 'gender' => 'male'];
         $sortBy = 'lastName';
         $sortOrder = 'desc';
-        
+
         $response = $this->responseFactory->createUserListSuccessResponse(
             $users,
             $currentFilters,
@@ -121,7 +121,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserListSuccessResponseWithDefaultParameters(): void
     {
         $users = [$this->sampleUser];
-        
+
         $response = $this->responseFactory->createUserListSuccessResponse($users);
 
         $this->assertInstanceOf(UserListResponseDto::class, $response);
@@ -138,7 +138,7 @@ final class ResponseFactoryTest extends TestCase
     {
         $users = [];
         $currentFilters = ['firstName' => 'Nieistniejący'];
-        
+
         $response = $this->responseFactory->createUserListSuccessResponse($users, $currentFilters);
 
         $this->assertInstanceOf(UserListResponseDto::class, $response);
@@ -150,7 +150,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserListFailureResponseWithApiAvailable(): void
     {
         $errors = ['Błąd podczas pobierania użytkowników', 'Timeout połączenia'];
-        
+
         $response = $this->responseFactory->createUserListFailureResponse($errors, true);
 
         $this->assertInstanceOf(UserListResponseDto::class, $response);
@@ -166,7 +166,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserListFailureResponseWithApiUnavailable(): void
     {
         $errors = ['API Phoenix jest niedostępne'];
-        
+
         $response = $this->responseFactory->createUserListFailureResponse($errors, false);
 
         $this->assertInstanceOf(UserListResponseDto::class, $response);
@@ -179,7 +179,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreateUserListFailureResponseWithDefaultApiAvailable(): void
     {
         $errors = ['Błąd serwera'];
-        
+
         $response = $this->responseFactory->createUserListFailureResponse($errors);
 
         $this->assertInstanceOf(UserListResponseDto::class, $response);
@@ -191,7 +191,7 @@ final class ResponseFactoryTest extends TestCase
     public function testResponseFactoryIsReadonly(): void
     {
         $reflection = new \ReflectionClass(ResponseFactory::class);
-        
+
         $this->assertTrue($reflection->isReadOnly());
     }
 
@@ -204,10 +204,10 @@ final class ResponseFactoryTest extends TestCase
             birthdate: new \DateTime('1985-08-20'),
             gender: GenderEnum::FEMALE
         );
-        
+
         $users = [$this->sampleUser, $user2];
         $currentFilters = ['gender' => 'all'];
-        
+
         $response = $this->responseFactory->createUserListSuccessResponse($users, $currentFilters);
 
         $this->assertInstanceOf(UserListResponseDto::class, $response);
@@ -228,7 +228,7 @@ final class ResponseFactoryTest extends TestCase
             'birthdateFrom' => '1990-01-01',
             'birthdateTo' => '1990-12-31',
         ];
-        
+
         $response = $this->responseFactory->createUserListSuccessResponse(
             $users,
             $currentFilters,

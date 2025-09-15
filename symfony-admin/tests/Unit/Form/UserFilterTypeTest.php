@@ -6,20 +6,12 @@ namespace App\Tests\Unit\Form;
 
 use App\Dto\FilterDto;
 use App\Form\UserFilterType;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
 final class UserFilterTypeTest extends TypeTestCase
 {
-    protected function getExtensions(): array
-    {
-        $validator = Validation::createValidator();
-
-        return [
-            new ValidatorExtension($validator),
-        ];
-    }
 
     public function testSubmitValidData(): void
     {
@@ -273,5 +265,13 @@ final class UserFilterTypeTest extends TypeTestCase
         $this->assertFalse($form->get('birthdateTo')->isRequired());
         $this->assertFalse($form->get('sortBy')->isRequired());
         $this->assertFalse($form->get('sortOrder')->isRequired());
+    }
+    protected function getExtensions(): array
+    {
+        $validator = Validation::createValidator();
+
+        return [
+            new ValidatorExtension($validator),
+        ];
     }
 }

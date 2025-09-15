@@ -18,7 +18,7 @@ final class SessionKeyTest extends TestCase
     public function testSessionKeyCases(): void
     {
         $cases = SessionKey::cases();
-        
+
         $this->assertCount(2, $cases);
         $this->assertContains(SessionKey::ADMIN_TOKEN, $cases);
         $this->assertContains(SessionKey::ADMIN_DATA, $cases);

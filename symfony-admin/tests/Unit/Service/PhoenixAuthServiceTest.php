@@ -10,7 +10,6 @@ use App\Enum\HttpStatus;
 use App\Service\PhoenixAuthService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -23,7 +22,7 @@ final class PhoenixAuthServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(HttpClientInterface::class);
-        
+
         $this->phoenixAuthService = new PhoenixAuthService(
             $this->httpClient,
             $this->phoenixApiUrl
@@ -36,11 +35,11 @@ final class PhoenixAuthServiceTest extends TestCase
         $password = 'password123';
         $token = 'jwt-token-123';
         $adminData = ['id' => 1, 'email' => 'admin@example.com'];
-        
+
         $responseData = [
             'success' => true,
             'token' => $token,
-            'admin' => $adminData
+            'admin' => $adminData,
         ];
 
         $response = $this->createMock(ResponseInterface::class);
@@ -78,9 +77,9 @@ final class PhoenixAuthServiceTest extends TestCase
     {
         $email = 'admin@example.com';
         $password = 'wrong-password';
-        
+
         $responseData = [
-            'error' => 'Invalid credentials'
+            'error' => 'Invalid credentials',
         ];
 
         $response = $this->createMock(ResponseInterface::class);
@@ -110,7 +109,7 @@ final class PhoenixAuthServiceTest extends TestCase
     {
         $email = 'admin@example.com';
         $password = 'password123';
-        
+
         $exception = new \Exception('Connection refused');
 
         $this->httpClient
@@ -129,11 +128,11 @@ final class PhoenixAuthServiceTest extends TestCase
     {
         $token = 'valid-jwt-token';
         $adminData = ['id' => 1, 'email' => 'admin@example.com'];
-        
+
         $responseData = [
             'success' => true,
             'valid' => true,
-            'admin' => $adminData
+            'admin' => $adminData,
         ];
 
         $response = $this->createMock(ResponseInterface::class);
@@ -170,11 +169,11 @@ final class PhoenixAuthServiceTest extends TestCase
     public function testVerifyTokenInvalid(): void
     {
         $token = 'invalid-jwt-token';
-        
+
         $responseData = [
             'success' => true,
             'valid' => false,
-            'error' => 'Token expired'
+            'error' => 'Token expired',
         ];
 
         $response = $this->createMock(ResponseInterface::class);
@@ -204,7 +203,7 @@ final class PhoenixAuthServiceTest extends TestCase
     public function testVerifyTokenConnectionError(): void
     {
         $token = 'some-token';
-        
+
         $exception = new \Exception('Network error');
 
         $this->httpClient
@@ -312,7 +311,7 @@ final class PhoenixAuthServiceTest extends TestCase
         $method = 'GET';
         $endpoint = '/users';
         $token = 'valid-token';
-        
+
         $exception = new \Exception('Connection timeout');
 
         $this->httpClient
@@ -331,7 +330,7 @@ final class PhoenixAuthServiceTest extends TestCase
         $method = 'GET';
         $endpoint = '/users';
         $token = 'valid-token';
-        
+
         $exception = new \RuntimeException('Unexpected error occurred');
 
         $this->httpClient

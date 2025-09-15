@@ -17,7 +17,7 @@ final class UserDtoTest extends TestCase
         $lastName = 'Doe';
         $birthdate = new \DateTime('1990-01-01');
         $gender = GenderEnum::MALE;
-        
+
         $dto = new UserDto(
             $id,
             $firstName,
@@ -25,7 +25,7 @@ final class UserDtoTest extends TestCase
             $birthdate,
             $gender
         );
-        
+
         $this->assertEquals($id, $dto->id);
         $this->assertEquals($firstName, $dto->firstName);
         $this->assertEquals($lastName, $dto->lastName);
@@ -36,7 +36,7 @@ final class UserDtoTest extends TestCase
     public function testConstructorWithNullableProperties(): void
     {
         $dto = new UserDto();
-        
+
         $this->assertNull($dto->id);
         $this->assertNull($dto->firstName);
         $this->assertNull($dto->lastName);
@@ -48,9 +48,9 @@ final class UserDtoTest extends TestCase
     {
         $id = 1;
         $firstName = 'Jane';
-        
+
         $dto = new UserDto($id, $firstName);
-        
+
         $this->assertEquals($id, $dto->id);
         $this->assertEquals($firstName, $dto->firstName);
         $this->assertNull($dto->lastName);
@@ -65,11 +65,11 @@ final class UserDtoTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birthdate' => '1990-01-01',
-            'gender' => 'male'
+            'gender' => 'male',
         ];
-        
+
         $dto = UserDto::fromArray($data);
-        
+
         $this->assertEquals(1, $dto->id);
         $this->assertEquals('John', $dto->firstName);
         $this->assertEquals('Doe', $dto->lastName);
@@ -81,11 +81,11 @@ final class UserDtoTest extends TestCase
     {
         $data = [
             'first_name' => 'Jane',
-            'gender' => 'female'
+            'gender' => 'female',
         ];
-        
+
         $dto = UserDto::fromArray($data);
-        
+
         $this->assertNull($dto->id);
         $this->assertEquals('Jane', $dto->firstName);
         $this->assertNull($dto->lastName);
@@ -96,7 +96,7 @@ final class UserDtoTest extends TestCase
     public function testFromArrayWithEmptyData(): void
     {
         $dto = UserDto::fromArray([]);
-        
+
         $this->assertNull($dto->id);
         $this->assertNull($dto->firstName);
         $this->assertNull($dto->lastName);
@@ -113,27 +113,27 @@ final class UserDtoTest extends TestCase
             new \DateTime('1990-01-01'),
             GenderEnum::MALE
         );
-        
+
         $array = $dto->toArray();
-        
+
         $this->assertEquals([
             'id' => 1,
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birthdate' => '1990-01-01',
-            'gender' => 'male'
+            'gender' => 'male',
         ], $array);
     }
 
     public function testToArrayWithNullValues(): void
     {
         $dto = new UserDto(1, 'John');
-        
+
         $array = $dto->toArray();
-        
+
         $this->assertEquals([
             'id' => 1,
-            'first_name' => 'John'
+            'first_name' => 'John',
         ], $array);
     }
 
@@ -147,26 +147,26 @@ final class UserDtoTest extends TestCase
             $birthdate,
             GenderEnum::MALE
         );
-        
+
         $array = $dto->toFormArray();
-        
+
         $this->assertEquals([
             'id' => 1,
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birthdate' => $birthdate,
-            'gender' => 'male'
+            'gender' => 'male',
         ], $array);
     }
 
     public function testToFormArrayWithNullValues(): void
     {
         $dto = new UserDto(null, 'Jane');
-        
+
         $array = $dto->toFormArray();
-        
+
         $this->assertEquals([
-            'first_name' => 'Jane'
+            'first_name' => 'Jane',
         ], $array);
     }
 }

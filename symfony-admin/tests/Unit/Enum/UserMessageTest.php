@@ -44,9 +44,9 @@ final class UserMessageTest extends TestCase
     public function testAllCasesAreDefined(): void
     {
         $cases = UserMessage::cases();
-        
+
         $this->assertCount(16, $cases);
-        
+
         $expectedCases = [
             UserMessage::USER_CREATED,
             UserMessage::USER_UPDATED,
@@ -65,7 +65,7 @@ final class UserMessageTest extends TestCase
             UserMessage::API_FETCH_USERS_ERROR,
             UserMessage::API_IMPORT_ERROR,
         ];
-        
+
         foreach ($expectedCases as $expectedCase) {
             $this->assertContains($expectedCase, $cases);
         }
@@ -98,7 +98,7 @@ final class UserMessageTest extends TestCase
     public function testEnumIsBackedByString(): void
     {
         $reflection = new \ReflectionEnum(UserMessage::class);
-        
+
         $this->assertTrue($reflection->isBacked());
         $this->assertSame('string', $reflection->getBackingType()->getName());
     }
@@ -117,7 +117,7 @@ final class UserMessageTest extends TestCase
             UserMessage::MAPPING_ERROR,
             UserMessage::VALIDATION_ERROR,
         ];
-        
+
         $englishMessages = [
             UserMessage::API_CREATE_ERROR,
             UserMessage::API_UPDATE_ERROR,
@@ -126,12 +126,12 @@ final class UserMessageTest extends TestCase
             UserMessage::API_FETCH_USERS_ERROR,
             UserMessage::API_IMPORT_ERROR,
         ];
-        
+
         foreach ($polishMessages as $message) {
             $hasPolishChars = preg_match('/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/', $message->value);
             $this->assertTrue($hasPolishChars > 0, 'Polish message should contain Polish characters: ' . $message->value);
         }
-        
+
         foreach ($englishMessages as $message) {
             $this->assertStringStartsWith('Failed to', $message->value, 'API error message should start with "Failed to"');
         }

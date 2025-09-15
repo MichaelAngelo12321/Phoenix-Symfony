@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\Dto\AuthenticationResultDto;
 use App\Dto\TokenVerificationResultDto;
-use App\Enum\HttpStatus;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

@@ -5,20 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Form;
 
 use App\Form\LoginFormType;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
 final class LoginFormTypeTest extends TypeTestCase
 {
-    protected function getExtensions(): array
-    {
-        $validator = Validation::createValidator();
-
-        return [
-            new ValidatorExtension($validator),
-        ];
-    }
 
     public function testSubmitValidData(): void
     {
@@ -192,5 +184,13 @@ final class LoginFormTypeTest extends TypeTestCase
             $this->assertFalse($form->isValid(), "Email {$email} should be invalid");
             $this->assertTrue($form->get('email')->getErrors()->count() > 0);
         }
+    }
+    protected function getExtensions(): array
+    {
+        $validator = Validation::createValidator();
+
+        return [
+            new ValidatorExtension($validator),
+        ];
     }
 }

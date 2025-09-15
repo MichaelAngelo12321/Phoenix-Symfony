@@ -17,14 +17,14 @@ final class UserRequestDtoTest extends TestCase
         $lastName = 'Doe';
         $birthdate = new \DateTime('1990-01-01');
         $gender = GenderEnum::MALE;
-        
+
         $dto = new UserRequestDto(
             $firstName,
             $lastName,
             $birthdate,
             $gender
         );
-        
+
         $this->assertEquals($firstName, $dto->firstName);
         $this->assertEquals($lastName, $dto->lastName);
         $this->assertEquals($birthdate, $dto->birthdate);
@@ -34,7 +34,7 @@ final class UserRequestDtoTest extends TestCase
     public function testConstructorWithNullableProperties(): void
     {
         $dto = new UserRequestDto();
-        
+
         $this->assertNull($dto->firstName);
         $this->assertNull($dto->lastName);
         $this->assertNull($dto->birthdate);
@@ -45,9 +45,9 @@ final class UserRequestDtoTest extends TestCase
     {
         $firstName = 'Jane';
         $gender = GenderEnum::FEMALE;
-        
+
         $dto = new UserRequestDto($firstName, null, null, $gender);
-        
+
         $this->assertEquals($firstName, $dto->firstName);
         $this->assertNull($dto->lastName);
         $this->assertNull($dto->birthdate);
@@ -60,11 +60,11 @@ final class UserRequestDtoTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birthdate' => new \DateTime('1990-01-01'),
-            'gender' => 'male'
+            'gender' => 'male',
         ];
-        
+
         $dto = UserRequestDto::fromArray($data);
-        
+
         $this->assertEquals('John', $dto->firstName);
         $this->assertEquals('Doe', $dto->lastName);
         $this->assertEquals($data['birthdate'], $dto->birthdate);
@@ -75,11 +75,11 @@ final class UserRequestDtoTest extends TestCase
     {
         $data = [
             'first_name' => 'Jane',
-            'gender' => 'female'
+            'gender' => 'female',
         ];
-        
+
         $dto = UserRequestDto::fromArray($data);
-        
+
         $this->assertEquals('Jane', $dto->firstName);
         $this->assertNull($dto->lastName);
         $this->assertNull($dto->birthdate);
@@ -89,7 +89,7 @@ final class UserRequestDtoTest extends TestCase
     public function testFromArrayWithEmptyData(): void
     {
         $dto = UserRequestDto::fromArray([]);
-        
+
         $this->assertNull($dto->firstName);
         $this->assertNull($dto->lastName);
         $this->assertNull($dto->birthdate);
@@ -104,25 +104,25 @@ final class UserRequestDtoTest extends TestCase
             new \DateTime('1990-01-01'),
             GenderEnum::MALE
         );
-        
+
         $array = $dto->toArray();
-        
+
         $this->assertEquals([
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birthdate' => '1990-01-01',
-            'gender' => 'male'
+            'gender' => 'male',
         ], $array);
     }
 
     public function testToArrayWithNullValues(): void
     {
         $dto = new UserRequestDto('John');
-        
+
         $array = $dto->toArray();
-        
+
         $this->assertEquals([
-            'first_name' => 'John'
+            'first_name' => 'John',
         ], $array);
     }
 
@@ -134,14 +134,14 @@ final class UserRequestDtoTest extends TestCase
             new \DateTime('1990-01-01'),
             GenderEnum::MALE
         );
-        
+
         $this->assertTrue($dto->isValid());
     }
 
     public function testIsValidWithMissingData(): void
     {
         $dto = new UserRequestDto('John');
-        
+
         $this->assertFalse($dto->isValid());
     }
 
@@ -153,18 +153,18 @@ final class UserRequestDtoTest extends TestCase
             new \DateTime('1990-01-01'),
             GenderEnum::MALE
         );
-        
+
         $errors = $dto->getValidationErrors();
-        
+
         $this->assertEmpty($errors);
     }
 
     public function testGetValidationErrorsWithInvalidData(): void
     {
         $dto = new UserRequestDto();
-        
+
         $errors = $dto->getValidationErrors();
-        
+
         $this->assertArrayHasKey('firstName', $errors);
         $this->assertArrayHasKey('lastName', $errors);
         $this->assertArrayHasKey('birthdate', $errors);
@@ -178,9 +178,9 @@ final class UserRequestDtoTest extends TestCase
     public function testGetValidationErrorsWithShortNames(): void
     {
         $dto = new UserRequestDto('J', 'D');
-        
+
         $errors = $dto->getValidationErrors();
-        
+
         $this->assertArrayHasKey('firstName', $errors);
         $this->assertArrayHasKey('lastName', $errors);
         $this->assertEquals(ValidatorMessage::FIRST_NAME_TOO_SHORT->value, $errors['firstName']);
@@ -191,9 +191,9 @@ final class UserRequestDtoTest extends TestCase
     {
         $futureDate = new \DateTime('+1 year');
         $dto = new UserRequestDto('John', 'Doe', $futureDate, GenderEnum::MALE);
-        
+
         $errors = $dto->getValidationErrors();
-        
+
         $this->assertArrayHasKey('birthdate', $errors);
         $this->assertEquals(ValidatorMessage::BIRTHDATE_FUTURE->value, $errors['birthdate']);
     }
@@ -206,7 +206,7 @@ final class UserRequestDtoTest extends TestCase
             new \DateTime('1985-05-15'),
             GenderEnum::FEMALE
         );
-        
+
         $this->assertEquals('Test', $dto->firstName);
         $this->assertEquals('User', $dto->lastName);
         $this->assertEquals('1985-05-15', $dto->birthdate->format('Y-m-d'));
