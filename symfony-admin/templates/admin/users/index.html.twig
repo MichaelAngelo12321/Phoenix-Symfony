@@ -123,7 +123,7 @@
                                     <tr>
                                         <th>Lp.</th>
                                         <th>
-                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'first_name', sort_order: (sort_by == 'first_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sortBy: 'first_name', sortOrder: (sort_by == 'first_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
                                                class="text-decoration-none text-dark d-flex align-items-center">
                                                 Imię
                                                 {% if sort_by == 'first_name' %}
@@ -134,7 +134,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'last_name', sort_order: (sort_by == 'last_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sortBy: 'last_name', sortOrder: (sort_by == 'last_name' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
                                                class="text-decoration-none text-dark d-flex align-items-center">
                                                 Nazwisko
                                                 {% if sort_by == 'last_name' %}
@@ -145,7 +145,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'birthdate', sort_order: (sort_by == 'birthdate' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sortBy: 'birthdate', sortOrder: (sort_by == 'birthdate' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
                                                class="text-decoration-none text-dark d-flex align-items-center">
                                                 Data urodzenia
                                                 {% if sort_by == 'birthdate' %}
@@ -156,7 +156,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="{{ path('admin_users_index', current_filters|merge({sort_by: 'gender', sort_order: (sort_by == 'gender' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
+                                            <a href="{{ path('admin_users_index', current_filters|merge({sortBy: 'gender', sortOrder: (sort_by == 'gender' and sort_order == 'asc') ? 'desc' : 'asc'})) }}" 
                                                class="text-decoration-none text-dark d-flex align-items-center">
                                                 Płeć
                                                 {% if sort_by == 'gender' %}

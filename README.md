@@ -131,12 +131,6 @@ docker-compose exec phoenix bash
 # Uruchomienie testów
 mix test
 
-# Konsola interaktywna
-iex -S mix
-
-# Generowanie nowej migracji
-mix ecto.gen.migration create_users
-
 # Formatowanie kodu
 mix format
 ```

@@ -40,6 +40,19 @@ services:
       - phoenix_build:/app/_build
     command: mix phx.server
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   symfony:
     build:
       context: ./symfony-admin
@@ -47,6 +60,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/phoenix_symfony_dev
       PHOENIX_API_URL: http://phoenix:4000/api
+      REDIS_URL: redis://redis:6379
       APP_ENV: dev
       APP_SECRET: "your-app-secret-here-change-in-production"
     ports:
@@ -54,6 +68,7 @@ services:
     depends_on:
       - postgres
       - phoenix
+      - redis
     volumes:
       - ./symfony-admin:/var/www
       - symfony_vendor:/var/www/vendor
@@ -62,6 +77,7 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
   phoenix_deps:
   phoenix_build:
   symfony_vendor:

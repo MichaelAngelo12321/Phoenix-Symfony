@@ -3,6 +3,10 @@ FROM elixir:1.18-alpine
 # Install build dependencies
 RUN apk add --no-cache \
     build-base \
+    cmake \
+    make \
+    gcc \
+    g++ \
     git \
     nodejs \
     npm \

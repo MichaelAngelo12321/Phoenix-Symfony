@@ -81,7 +81,7 @@ defmodule PhoenixApi.AccountsTest do
       assert Map.has_key?(user_data, :gender)
       assert Map.has_key?(user_data, :birthdate)
       
-      assert user_data.gender in ["male", "female"]
+      assert user_data.gender in [:male, :female]
       assert is_binary(user_data.first_name)
       assert is_binary(user_data.last_name)
       assert %Date{} = user_data.birthdate

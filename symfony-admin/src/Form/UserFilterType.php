@@ -127,7 +127,7 @@ final class UserFilterType extends AbstractType
         $resolver->setDefaults([
             'data_class' => FilterDto::class,
             'method' => 'GET',
-            'csrf_protection' => true,
+            'csrf_protection' => false,
         ]);
     }
 

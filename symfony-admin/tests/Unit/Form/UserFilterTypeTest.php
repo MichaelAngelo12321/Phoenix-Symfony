@@ -198,12 +198,12 @@ final class UserFilterTypeTest extends TypeTestCase
         $this->assertEquals('asc', $form->get('sortOrder')->getData());
     }
 
-    public function testCsrfProtectionEnabled(): void
+    public function testCsrfProtectionDisabled(): void
     {
         $form = $this->factory->create(UserFilterType::class);
         $config = $form->getConfig();
 
-        $this->assertTrue($config->getOption('csrf_protection'));
+        $this->assertFalse($config->getOption('csrf_protection'));
     }
 
     public function testFormDataClass(): void

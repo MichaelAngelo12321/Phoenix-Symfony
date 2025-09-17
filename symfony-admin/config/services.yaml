@@ -23,3 +23,12 @@ services:
     App\EventListener\AuthenticationListener:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 10 }
+
+    # Phoenix API Service with caching
+    App\Service\CacheablePhoenixApiService:
+        arguments:
+            $phoenixApiService: '@App\Service\PhoenixApiService'
+            $cache: '@phoenix_api_cache'
+        
+    # Alias for interface binding
+    App\Service\PhoenixApiServiceInterface: '@App\Service\CacheablePhoenixApiService'

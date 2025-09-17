@@ -178,10 +178,10 @@ defmodule PhoenixApi.Accounts do
     first_names_female = ["Anna", "Barbara", "Celina", "Dorota", "Ewa", "Franciszka", "Grażyna", "Halina", "Irena", "Joanna"]
     last_names = ["Nowak", "Kowalski", "Wiśniewski", "Dąbrowski", "Lewandowski", "Wójcik", "Kamiński", "Kowalczyk", "Zieliński", "Szymański"]
     
-    gender = Enum.random(["male", "female"])
+    gender = Enum.random([:male, :female])
     first_name = case gender do
-      "male" -> Enum.random(first_names_male)
-      "female" -> Enum.random(first_names_female)
+      :male -> Enum.random(first_names_male)
+      :female -> Enum.random(first_names_female)
     end
     
     %{
